@@ -44,7 +44,7 @@ Route::controller(SiteController::class)->group(function () use ($productSlugPat
     Route::get('/news', 'newsList')->name('news.list');
     Route::get('/news/{slug}', 'newsShow')->name('news.show');
     Route::get('/products/{slug}', 'product')->where('slug', $productSlugPattern)->name('products.category');
-    Route::get('/{slug}', fn ($slug) => redirect('/products/'.$slug, 301))->where('slug', $productSlugPattern);
+    Route::get('/{slug}', 'product')->where('slug', $productSlugPattern);
     Route::get('/products/{product}', 'productDetail')->where('product', '[0-9]+')->name('products.show');
 });
 

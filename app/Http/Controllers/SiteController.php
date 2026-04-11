@@ -73,12 +73,16 @@ class SiteController extends Controller
             ->get();
 
         $grouped = $products->groupBy('category');
+        $categoryShowcase = $grouped
+            ->map(fn ($items, $category) => $this->categoryMetaFor($category, $items))
+            ->values();
 
         return view('site.products.index', $this->sharedData([
             'title' => 'Products | Butende Brick Works',
             'metaDescription' => 'Browse bricks, floor tiles, decorative bricks, ventilators, and other fired clay products from Butende Brick Works.',
             'products' => $products,
             'grouped'  => $grouped,
+            'categoryShowcase' => $categoryShowcase,
             'talkToUsHeading' => 'Interested in our products?',
             'talkToUsBody' => 'Request product samples, technical specifications, or a quote for any of our fired clay products.',
         ]));
@@ -106,13 +110,7 @@ class SiteController extends Controller
 
     public function product(string $slug)
     {
-        $categoryMap = [
-            'bricks'             => 'Bricks',
-            'floor-tiles'        => 'Floor Tiles',
-            'ventilators'        => 'Ventilators',
-            'decorative-bricks'  => 'Decorative Bricks',
-            'other'              => 'Other',
-        ];
+        $categoryMap = $this->categorySlugMap();
 
         abort_unless(isset($categoryMap[$slug]), 404);
 
@@ -121,6 +119,7 @@ class SiteController extends Controller
             ->where('category', $categoryName)
             ->orderBy('name')
             ->get();
+        $categoryMeta = $this->categoryMetaFor($categoryName, $categoryProducts);
 
         return view('site.products.category', $this->sharedData([
             'title'            => $categoryName.' | Butende Brick Works',
@@ -128,6 +127,7 @@ class SiteController extends Controller
             'categoryProducts' => $categoryProducts,
             'categoryName'     => $categoryName,
             'categorySlug'     => $slug,
+            'categoryMeta'     => $categoryMeta,
             'talkToUsHeading'  => 'Interested in our '.$categoryName.'?',
             'talkToUsBody'     => 'Tell us your project requirements and we will help you find the right product.',
         ]));
@@ -290,6 +290,60 @@ class SiteController extends Controller
         ]));
     }
 
+    private function categorySlugMap(): array
+    {
+        return [
+            'bricks' => 'Bricks',
+            'floor-tiles' => 'Floor Tiles',
+            'ventilators' => 'Ventilators',
+            'decorative-bricks' => 'Decorative Bricks',
+            'other' => 'Other',
+        ];
+    }
+
+    private function categoryContentLibrary(): array
+    {
+        $products = SiteContent::products();
+
+        return [
+            'bricks' => $products['bricks'],
+            'floor-tiles' => $products['floor-tiles'],
+            'ventilators' => $products['ventilators'],
+            'decorative-bricks' => $products['decorative-bricks'],
+            'other' => $products['other-products'],
+        ];
+    }
+
+    private function slugForCategory(string $categoryName): string
+    {
+        return array_search($categoryName, $this->categorySlugMap(), true) ?: Str::slug($categoryName);
+    }
+
+    private function categoryMetaFor(string $categoryName, $products = null): array
+    {
+        $items = collect($products ?? []);
+        $slug = $this->slugForCategory($categoryName);
+        $library = $this->categoryContentLibrary()[$slug] ?? [];
+        $firstProduct = $items->first();
+
+        $imageUrl = $firstProduct?->image
+            ? Storage::disk('public')->url($firstProduct->image)
+            : ($library['image'] ?? null);
+
+        return [
+            'slug' => $slug,
+            'name' => $categoryName,
+            'path' => '/products/'.$slug,
+            'tagline' => $library['tagline'] ?? Str::limit($firstProduct?->description ?? $categoryName.' products for long-life construction work.', 88),
+            'summary' => $library['summary'] ?? Str::limit($firstProduct?->description ?? 'Browse our fired clay '.$categoryName.' range for residential, institutional, and commercial projects.', 190),
+            'image' => $imageUrl,
+            'benefits' => $library['benefits'] ?? [],
+            'applications' => $library['applications'] ?? [],
+            'count' => $items->count(),
+            'featuredProductName' => $firstProduct?->name,
+        ];
+    }
+
     private function productCategories(): array
     {
         return BrickProduct::active()
@@ -298,17 +352,7 @@ class SiteController extends Controller
             ->get(['id', 'name', 'category', 'description', 'image'])
             ->groupBy('category')
             ->map(function ($items, $category) {
-                $first    = $items->first();
-                $imageUrl = $first->image
-                    ? Storage::disk('public')->url($first->image)
-                    : null;
-
-                return [
-                    'name'    => $category,
-                    'path'    => '/products/'.Str::slug($category),
-                    'tagline' => Str::limit($first->description ?? $category.' products', 80),
-                    'image'   => $imageUrl,
-                ];
+                return $this->categoryMetaFor($category, $items);
             })
             ->values()
             ->toArray();

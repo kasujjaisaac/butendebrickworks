@@ -14,12 +14,12 @@
                 <span class="text-white/90">{{ $product->name }}</span>
             </nav>
             <div class="max-w-2xl">
-                @if ($product->category)
-                    <span class="inline-block rounded-sm border border-white/25 bg-white/10 px-3 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.28em] text-white/80">{{ $product->category }}</span>
-                @endif
-                <h1 class="mt-3 font-display text-3xl font-semibold leading-snug tracking-tight text-white md:text-4xl">
-                    {{ $product->name }}
-                </h1>
+                    @if ($product->category)
+                        <span class="inline-block rounded-sm border border-white/25 bg-white/10 px-3 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.28em] text-white/80">{{ $product->category }}</span>
+                    @endif
+                    <h1 class="mt-3 font-display text-3xl font-semibold leading-snug tracking-tight text-white md:text-4xl">
+                        {{ $product->name }}
+                    </h1>
                 @if ($product->description)
                     <p class="mt-4 text-base leading-7 text-white/70">{{ $product->description }}</p>
                 @endif
@@ -28,18 +28,18 @@
                 <div class="mt-7 flex flex-wrap gap-3">
                     @auth
                         <a href="{{ route('quotation.create', ['product_id' => $product->id]) }}"
-                           class="inline-flex items-center gap-2 rounded-lg bg-white px-5 py-2.5 text-sm font-semibold text-[#6e2f0e] shadow transition hover:bg-stone-50">
+                           class="inline-flex items-center gap-2 rounded-sm bg-white px-5 py-2.5 text-sm font-semibold text-[#6e2f0e] shadow transition hover:bg-stone-50">
                             <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg>
                             Request a Quote
                         </a>
                     @else
                         <a href="{{ route('login') }}"
-                           class="inline-flex items-center gap-2 rounded-lg bg-white px-5 py-2.5 text-sm font-semibold text-[#6e2f0e] shadow transition hover:bg-stone-50">
+                           class="inline-flex items-center gap-2 rounded-sm bg-white px-5 py-2.5 text-sm font-semibold text-[#6e2f0e] shadow transition hover:bg-stone-50">
                             Request a Quote
                         </a>
                     @endauth
                     <a href="{{ route('calculator') }}"
-                       class="inline-flex items-center gap-2 rounded-lg border border-white/30 bg-white/10 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/20">
+                       class="inline-flex items-center gap-2 rounded-sm border border-white/30 bg-white/10 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/20">
                         <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 15.75V18m-7.5-6.75h.008v.008H8.25v-.008Zm0 2.25h.008v.008H8.25V13.5Zm0 2.25h.008v.008H8.25v-.008Zm0 2.25h.008v.008H8.25V18Zm2.498-6.75h.007v.008h-.007v-.008Zm0 2.25h.007v.008h-.007V13.5Zm0 2.25h.007v.008h-.007v-.008Zm0 2.25h.007v.008h-.007V18Zm2.504-6.75h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V13.5Zm0 2.25h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V18Zm2.498-6.75h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V13.5ZM8.25 6h7.5v2.25h-7.5V6ZM12 2.25c-1.892 0-3.758.11-5.593.322C5.307 2.7 4.5 3.598 4.5 4.564v15.872c0 .966.807 1.864 1.907 1.992C8.242 22.34 10.108 22.5 12 22.5c1.892 0 3.758-.11 5.593-.322 1.1-.128 1.907-1.026 1.907-1.992V4.564c0-.966-.807-1.864-1.907-1.992A48.507 48.507 0 0 0 12 2.25Z"/></svg>
                         Calculate Quantities
                     </a>
@@ -55,13 +55,13 @@
             {{-- LEFT: Image --}}
             <div class="lg:col-span-3">
                 @if ($product->image)
-                    <div class="overflow-hidden rounded-xl border border-stone-200 shadow-sm">
+                    <div class="overflow-hidden border border-stone-200 shadow-sm">
                         <img src="{{ Storage::url($product->image) }}"
                              alt="{{ $product->name }}"
                              class="aspect-[4/3] w-full object-cover">
                     </div>
                 @else
-                    <div class="flex aspect-[4/3] w-full items-center justify-center rounded-xl border border-stone-200 bg-gradient-to-br from-stone-100 to-stone-200">
+                    <div class="flex aspect-[4/3] w-full items-center justify-center border border-stone-200 bg-gradient-to-br from-stone-100 to-stone-200">
                         <svg class="h-20 w-20 text-stone-300" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"/></svg>
                     </div>
                 @endif
@@ -71,7 +71,7 @@
             <div class="lg:col-span-2 space-y-6">
 
                 {{-- Specs card --}}
-                <div class="overflow-hidden rounded-xl border border-stone-200 bg-white shadow-sm">
+                <div class="overflow-hidden border border-stone-200 bg-white shadow-sm">
                     <div class="border-b border-stone-100 bg-stone-50 px-5 py-3.5">
                         <p class="text-xs font-bold uppercase tracking-widest text-stone-500">Specifications</p>
                     </div>
@@ -121,24 +121,24 @@
                 </div>
 
                 {{-- CTA card --}}
-                <div class="overflow-hidden rounded-xl border border-[#6e2f0e]/20 bg-[#6e2f0e]/5 p-5">
+                <div class="overflow-hidden border border-[#6e2f0e]/20 bg-[#6e2f0e]/5 p-5">
                     <p class="text-sm font-semibold text-stone-900">Ready to order or get a quote?</p>
                     <p class="mt-1 text-xs leading-5 text-stone-600">Use our calculator to estimate quantities, then request a formal quotation from our team.</p>
                     <div class="mt-4 flex flex-col gap-2">
                         @auth
                             <a href="{{ route('quotation.create', ['product_id' => $product->id]) }}"
-                               class="flex w-full items-center justify-center gap-2 rounded-lg bg-[#6e2f0e] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#8c3d12]">
+                               class="flex w-full items-center justify-center gap-2 rounded-sm bg-[#6e2f0e] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#8c3d12]">
                                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg>
                                 Request a Quotation
                             </a>
                         @else
                             <a href="{{ route('login') }}"
-                               class="flex w-full items-center justify-center gap-2 rounded-lg bg-[#6e2f0e] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#8c3d12]">
+                               class="flex w-full items-center justify-center gap-2 rounded-sm bg-[#6e2f0e] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#8c3d12]">
                                 Sign in to Request a Quote
                             </a>
                         @endauth
                         <a href="{{ route('calculator') }}"
-                           class="flex w-full items-center justify-center gap-2 rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-sm font-medium text-stone-700 transition hover:bg-stone-50">
+                           class="flex w-full items-center justify-center gap-2 rounded-sm border border-stone-300 bg-white px-4 py-2.5 text-sm font-medium text-stone-700 transition hover:bg-stone-50">
                             Calculate Quantities First
                         </a>
                     </div>
@@ -154,7 +154,7 @@
                 <h2 class="mb-7 font-display text-xl font-semibold tracking-tight text-stone-900">More in {{ $product->category }}</h2>
                 <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
                     @foreach ($related as $rel)
-                        <article class="group flex flex-col overflow-hidden rounded-xl border border-stone-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-md">
+                        <article class="group flex flex-col overflow-hidden border border-stone-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-md">
                             <a href="{{ route('products.show', $rel) }}" class="block aspect-[4/3] overflow-hidden bg-stone-100">
                                 @if ($rel->image)
                                     <img src="{{ Storage::url($rel->image) }}" alt="{{ $rel->name }}"
