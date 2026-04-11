@@ -23,3 +23,30 @@ _ide_helper.php
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Backup and temp files
+*.bak
+*.tmp
+*.swp
+*.swo
+*.old
+*.orig
+
+# Database files
+*.sql
+*.sqlite
+*.db
+
+# OS-specific files
+.AppleDouble
+.LSOverride
+Icon?
+
+# IDE/editor files (add more as needed)
+.history/
+
+# Laravel storage (granular)
+/storage/logs
+/storage/framework/cache
+/storage/framework/sessions
+/storage/framework/views
