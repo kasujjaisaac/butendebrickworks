@@ -1,0 +1,366 @@
+@extends('layouts.admin')
+
+@section('admin-content')
+
+@php
+    $allSections = [
+        'company'         => 'Company Profile',
+        'hero_slides'     => 'Hero Slides',
+        'stats'           => 'Stats Band',
+        'capabilities'    => 'Capabilities',
+        'process'         => 'Process Steps',
+        'testimonials'    => 'Testimonials',
+        'partners'        => 'Partners',
+        'projects_in_use' => 'Projects In Use',
+    ];
+    $sectionsDone  = count($editedSections);
+    $sectionsTotal = $totalSections;
+    $sectionPct    = $sectionsTotal > 0 ? round(($sectionsDone / $sectionsTotal) * 100) : 0;
+@endphp
+
+{{-- GREETING --}}
+<div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+        <p class="text-[10px] font-semibold uppercase tracking-[0.22em] text-stone-400">{{ now()->format('l, d F Y') }}</p>
+        <h2 class="mt-0.5 text-xl font-bold text-stone-900">Welcome back, {{ explode(' ', auth()->user()->name)[0] }}</h2>
+    </div>
+    <div class="flex gap-2">
+        <a href="{{ route('admin.messages.index') }}"
+           class="inline-flex items-center gap-1.5 rounded-lg border border-stone-200 bg-white px-3 py-1.5 text-xs font-medium text-stone-700 transition hover:bg-stone-50">
+            <svg class="h-3.5 w-3.5 text-[#6e2f0e]" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"/></svg>
+            Inbox
+        </a>
+        <a href="{{ route('admin.home.edit') }}"
+           class="inline-flex items-center gap-1.5 rounded-lg bg-[#6e2f0e] px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-[#8c3d12]">
+            <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z"/></svg>
+            Edit Content
+        </a>
+    </div>
+</div>
+
+{{-- ROW 1 — KPI CARDS (4 equal square cards) --}}
+<div class="grid grid-cols-2 gap-3 xl:grid-cols-4">
+
+    {{-- Total Messages --}}
+    <article class="flex aspect-square flex-col justify-between overflow-hidden rounded-xl border border-stone-200 bg-white p-4">
+        <div class="flex items-start justify-between gap-2">
+            <div>
+                <p class="text-[10px] font-semibold uppercase tracking-widest text-stone-400">Messages</p>
+                <p class="mt-2 text-3xl font-bold text-stone-900">{{ $totalMessages }}</p>
+                <p class="mt-1 text-xs text-stone-500">All time</p>
+            </div>
+            <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-stone-100 text-stone-600">
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"/></svg>
+            </div>
+        </div>
+        <div class="flex flex-wrap gap-1.5 border-t border-stone-100 pt-3">
+            <span class="rounded bg-emerald-50 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-700">{{ $readMessages }} read</span>
+            <span class="rounded {{ $unreadMessages > 0 ? 'bg-red-50 text-red-600' : 'bg-stone-100 text-stone-400' }} px-1.5 py-0.5 text-[10px] font-semibold">{{ $unreadMessages }} unread</span>
+        </div>
+    </article>
+
+    {{-- Unread --}}
+    <article class="flex aspect-square flex-col justify-between overflow-hidden rounded-xl border {{ $unreadMessages > 0 ? 'border-red-200 bg-red-50/30' : 'border-stone-200 bg-white' }} p-4">
+        <div class="flex items-start justify-between gap-2">
+            <div>
+                <p class="text-[10px] font-semibold uppercase tracking-widest {{ $unreadMessages > 0 ? 'text-red-400' : 'text-stone-400' }}">Unread</p>
+                <p class="mt-2 text-3xl font-bold {{ $unreadMessages > 0 ? 'text-red-600' : 'text-stone-900' }}">{{ $unreadMessages }}</p>
+                <p class="mt-1 text-xs {{ $unreadMessages > 0 ? 'text-red-500' : 'text-stone-500' }}">{{ $unreadMessages > 0 ? 'Need reply' : 'All clear' }}</p>
+            </div>
+            <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg {{ $unreadMessages > 0 ? 'bg-red-100 text-red-500' : 'bg-stone-100 text-stone-400' }}">
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"/></svg>
+            </div>
+        </div>
+        <div class="border-t {{ $unreadMessages > 0 ? 'border-red-100' : 'border-stone-100' }} pt-3">
+            @if ($unreadMessages > 0)
+                <a href="{{ route('admin.messages.index', ['filter' => 'unread']) }}" class="text-[11px] font-semibold text-red-600 hover:underline">Open →</a>
+            @else
+                <p class="text-[11px] text-stone-400">{{ $lastMessageAt ? $lastMessageAt->diffForHumans() : 'No messages yet' }}</p>
+            @endif
+        </div>
+    </article>
+
+    {{-- Products --}}
+    <article class="flex aspect-square flex-col justify-between overflow-hidden rounded-xl border border-stone-200 bg-white p-4">
+        <div class="flex items-start justify-between gap-2">
+            <div>
+                <p class="text-[10px] font-semibold uppercase tracking-widest text-stone-400">Products</p>
+                <p class="mt-2 text-3xl font-bold text-stone-900">{{ $productFamilies }}</p>
+                <p class="mt-1 text-xs text-stone-500">{{ $totalProducts }} profiles</p>
+            </div>
+            <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-stone-100 text-stone-600">
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z"/></svg>
+            </div>
+        </div>
+        <div class="border-t border-stone-100 pt-3">
+            <a href="{{ route('admin.products.index') }}" class="text-[11px] font-semibold text-stone-700 hover:underline">Manage →</a>
+        </div>
+    </article>
+
+    {{-- Partners --}}
+    <article class="flex aspect-square flex-col justify-between overflow-hidden rounded-xl border border-stone-200 bg-white p-4">
+        <div class="flex items-start justify-between gap-2">
+            <div>
+                <p class="text-[10px] font-semibold uppercase tracking-widest text-stone-400">Partners</p>
+                <p class="mt-2 text-3xl font-bold text-stone-900">{{ $partnerCount }}</p>
+                <p class="mt-1 text-xs text-stone-500">{{ $reviewCount }} reviews</p>
+            </div>
+            <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-stone-100 text-stone-600">
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z"/></svg>
+            </div>
+        </div>
+        <div class="flex gap-1.5 border-t border-stone-100 pt-3">
+            <span class="rounded bg-stone-100 px-1.5 py-0.5 text-[10px] font-semibold text-stone-500">{{ $supplierCount }} supp.</span>
+            <span class="rounded bg-stone-100 px-1.5 py-0.5 text-[10px] font-semibold text-stone-500">{{ $clientCount }} clients</span>
+        </div>
+    </article>
+</div>
+
+{{-- ROW 2 — PRODUCTS  +  MESSAGES BREAKDOWN --}}
+<div class="mt-4 grid gap-4 lg:grid-cols-2">
+
+    {{-- Products by category --}}
+    <div class="overflow-hidden rounded-xl border border-stone-200 bg-white">
+        <div class="flex items-center justify-between border-b border-stone-100 px-4 py-3">
+            <p class="text-xs font-bold text-stone-900">Product Catalogue</p>
+            <a href="{{ route('admin.products.index') }}" class="text-[11px] font-semibold text-[#6e2f0e] hover:underline">Manage →</a>
+        </div>
+        <div class="divide-y divide-stone-100">
+            @foreach ($productBreakdown as $cat)
+                @php
+                    $pct = $totalProducts > 0 ? round(($cat['count'] / $totalProducts) * 100) : 0;
+                    $barColors = [
+                        'bricks'            => 'bg-[#6e2f0e]',
+                        'floor-tiles'       => 'bg-[#8f4420]',
+                        'decorative-bricks' => 'bg-[#a85a30]',
+                        'ventilators'       => 'bg-[#c07040]',
+                        'other-products'    => 'bg-[#d49060]',
+                    ];
+                    $barColor = $barColors[$cat['slug']] ?? 'bg-stone-400';
+                @endphp
+                <div class="flex items-center gap-3 px-4 py-2.5">
+                    <div class="flex h-7 w-7 shrink-0 items-center justify-center rounded {{ $barColor }} text-white">
+                        <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6.429 9.75 2.25 12l4.179 2.25m0-4.5 5.571 3 5.571-3m-11.142 0L2.25 7.5 12 2.25l9.75 5.25-4.179 2.25m0 0L21.75 12l-4.179 2.25m0 0 4.179 2.25L12 21.75 2.25 16.5l4.179-2.25m11.142 0-5.571 3-5.571-3"/></svg>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <div class="flex items-center justify-between gap-2">
+                            <p class="truncate text-xs font-semibold text-stone-800">{{ $cat['name'] }}</p>
+                            <span class="shrink-0 text-xs font-bold text-stone-900">{{ $cat['count'] }}</span>
+                        </div>
+                        <div class="mt-1 h-1 w-full overflow-hidden rounded-full bg-stone-100">
+                            <div class="{{ $barColor }} h-full rounded-full" style="width: {{ $pct }}%"></div>
+                        </div>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+        <div class="border-t border-stone-100 px-4 py-2 text-center">
+            <p class="text-[10px] text-stone-400">{{ $totalProducts }} profiles · {{ $productFamilies }} families</p>
+        </div>
+    </div>
+
+    {{-- Message Stats --}}
+    <div class="overflow-hidden rounded-xl border border-stone-200 bg-white">
+        <div class="flex items-center justify-between border-b border-stone-100 px-4 py-3">
+            <p class="text-xs font-bold text-stone-900">Message Stats</p>
+            <a href="{{ route('admin.messages.index') }}" class="text-[11px] font-semibold text-[#6e2f0e] hover:underline">Open inbox →</a>
+        </div>
+        <div class="px-4 py-4">
+            @php
+                $readPct   = $totalMessages > 0 ? round(($readMessages / $totalMessages) * 100) : 0;
+                $unreadPct = 100 - $readPct;
+            @endphp
+            <div class="flex items-center gap-5">
+                {{-- Donut --}}
+                <div class="relative shrink-0">
+                    <svg class="h-24 w-24 -rotate-90" viewBox="0 0 36 36">
+                        <circle cx="18" cy="18" r="15.9155" fill="none" stroke="#f3f4f6" stroke-width="3"/>
+                        @if ($totalMessages > 0)
+                            <circle cx="18" cy="18" r="15.9155" fill="none" stroke="#6e2f0e" stroke-width="3"
+                                stroke-dasharray="{{ $readPct }},{{ $unreadPct }}"
+                                stroke-linecap="round"/>
+                            @if ($unreadMessages > 0)
+                            <circle cx="18" cy="18" r="15.9155" fill="none" stroke="#ef4444" stroke-width="3"
+                                stroke-dasharray="{{ $unreadPct }},{{ $readPct }}"
+                                stroke-dashoffset="{{ -$readPct }}"
+                                stroke-linecap="round"/>
+                            @endif
+                        @endif
+                    </svg>
+                    <div class="absolute inset-0 flex flex-col items-center justify-center">
+                        <span class="text-lg font-bold text-stone-900">{{ $totalMessages }}</span>
+                        <span class="text-[9px] font-semibold uppercase tracking-wider text-stone-400">total</span>
+                    </div>
+                </div>
+                {{-- Stats list --}}
+                <div class="flex-1 space-y-2">
+                    <div class="flex items-center justify-between text-xs">
+                        <div class="flex items-center gap-1.5"><span class="h-2 w-2 rounded-full bg-[#6e2f0e]"></span><span class="text-stone-600">Read</span></div>
+                        <span class="font-bold text-stone-900">{{ $readMessages }} <span class="font-normal text-stone-400">{{ $readPct }}%</span></span>
+                    </div>
+                    <div class="flex items-center justify-between text-xs">
+                        <div class="flex items-center gap-1.5"><span class="h-2 w-2 rounded-full bg-red-500"></span><span class="text-stone-600">Unread</span></div>
+                        <span class="font-bold text-stone-900">{{ $unreadMessages }} <span class="font-normal text-stone-400">{{ $unreadPct }}%</span></span>
+                    </div>
+                    <div class="flex items-center justify-between border-t border-stone-100 pt-2 text-xs">
+                        <span class="text-stone-500">This week</span>
+                        <span class="font-semibold text-stone-800">{{ $weekMessages }}</span>
+                    </div>
+                    <div class="flex items-center justify-between text-xs">
+                        <span class="text-stone-500">This month</span>
+                        <span class="font-semibold text-stone-800">{{ $monthMessages }}</span>
+                    </div>
+                    <div class="flex items-center justify-between text-xs">
+                        <span class="text-stone-500">Today</span>
+                        <span class="font-semibold {{ $todayMessages > 0 ? 'text-emerald-600' : 'text-stone-400' }}">{{ $todayMessages }}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-3 grid grid-cols-2 gap-2 border-t border-stone-100 pt-3">
+                <a href="{{ route('admin.messages.index', ['filter' => 'unread']) }}"
+                   class="flex items-center justify-center gap-1.5 rounded-lg border border-red-200 py-2 text-[11px] font-semibold text-red-600 transition hover:bg-red-50">
+                    <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"/></svg>
+                    {{ $unreadMessages }} Unread
+                </a>
+                <a href="{{ route('admin.quotations.index') }}"
+                   class="flex items-center justify-center gap-1.5 rounded-lg border border-stone-200 py-2 text-[11px] font-semibold text-stone-700 transition hover:bg-stone-50">
+                    <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg>
+                    Quotations
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- ROW 3 — RECENT MESSAGES + SIDEBAR --}}
+<div class="mt-4 grid gap-4 xl:grid-cols-[1fr_260px]">
+
+    {{-- Recent Messages --}}
+    <div class="overflow-hidden rounded-xl border border-stone-200 bg-white">
+        <div class="flex items-center justify-between border-b border-stone-100 px-4 py-3">
+            <p class="text-xs font-bold text-stone-900">Recent Messages</p>
+            <a href="{{ route('admin.messages.index') }}" class="text-[11px] font-semibold text-[#6e2f0e] hover:underline">View all →</a>
+        </div>
+        @if ($recentMessages->isEmpty())
+            <div class="flex flex-col items-center justify-center py-12 text-center">
+                <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-stone-100 text-stone-400">
+                    <svg class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"/></svg>
+                </div>
+                <p class="mt-2 text-xs text-stone-400">No messages yet</p>
+            </div>
+        @else
+            <div class="divide-y divide-stone-100">
+                @foreach ($recentMessages as $msg)
+                    <a href="{{ route('admin.messages.show', $msg) }}"
+                       class="flex items-center gap-3 px-4 py-2.5 transition hover:bg-stone-50 {{ !$msg->is_read ? 'bg-stone-50/60' : '' }}">
+                        <div class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-stone-900 text-[10px] font-bold uppercase text-white">
+                            {{ substr($msg->name, 0, 1) }}
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <div class="flex items-center justify-between gap-2">
+                                <p class="truncate text-xs {{ $msg->is_read ? 'font-medium text-stone-600' : 'font-semibold text-stone-900' }}">
+                                    {{ $msg->name }}
+                                    @if (!$msg->is_read)
+                                        <span class="ml-1 inline-block h-1.5 w-1.5 rounded-full bg-red-500 align-middle"></span>
+                                    @endif
+                                </p>
+                                <span class="shrink-0 text-[10px] text-stone-400">{{ $msg->created_at->diffForHumans(null, true, true) }}</span>
+                            </div>
+                            <p class="mt-0.5 truncate text-[11px] text-stone-400">{{ $msg->subject }}</p>
+                        </div>
+                    </a>
+                @endforeach
+            </div>
+        @endif
+    </div>
+
+    {{-- Right column --}}
+    <div class="space-y-4">
+
+        {{-- Content Health --}}
+        <div class="overflow-hidden rounded-xl border border-stone-200 bg-white">
+            <div class="flex items-center justify-between border-b border-stone-100 px-4 py-3">
+                <p class="text-xs font-bold text-stone-900">Content Health</p>
+                <span class="rounded bg-stone-100 px-2 py-0.5 text-[10px] font-bold text-stone-600">{{ $sectionsDone }}/{{ $sectionsTotal }}</span>
+            </div>
+            <div class="px-4 py-3">
+                <div class="h-1.5 w-full overflow-hidden rounded-full bg-stone-100">
+                    <div class="h-full rounded-full bg-[#6e2f0e]" style="width: {{ $sectionPct }}%"></div>
+                </div>
+                <p class="mt-1.5 text-[10px] text-stone-400">{{ $sectionPct }}% of sections customised</p>
+            </div>
+            <ul class="divide-y divide-stone-100 border-t border-stone-100">
+                @foreach ($allSections as $key => $label)
+                    <li class="flex items-center justify-between px-4 py-2">
+                        <span class="text-[11px] {{ in_array($key, $editedSections) ? 'text-stone-700' : 'text-stone-400' }}">{{ $label }}</span>
+                        @if (in_array($key, $editedSections))
+                            <svg class="h-3.5 w-3.5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg>
+                        @else
+                            <span class="text-[10px] text-stone-300">—</span>
+                        @endif
+                    </li>
+                @endforeach
+            </ul>
+            <div class="border-t border-stone-100 px-4 py-3">
+                <a href="{{ route('admin.home.edit') }}"
+                   class="flex w-full items-center justify-center gap-1.5 rounded-lg bg-[#6e2f0e] py-2 text-[11px] font-bold text-white transition hover:bg-[#8c3d12]">
+                    <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z"/></svg>
+                    Open Editor
+                </a>
+            </div>
+        </div>
+
+        {{-- Site Identity --}}
+        <div class="overflow-hidden rounded-xl border border-stone-200 bg-white">
+            <div class="border-b border-stone-100 px-4 py-3">
+                <p class="text-xs font-bold text-stone-900">{{ $company['name'] }}</p>
+                <p class="mt-0.5 text-[11px] text-stone-400">{{ $company['tagline'] }}</p>
+            </div>
+            <dl class="divide-y divide-stone-100">
+                <div class="flex items-center gap-2 px-4 py-2">
+                    <svg class="h-3.5 w-3.5 shrink-0 text-stone-300" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"/></svg>
+                    <a href="mailto:{{ $company['emails'][0] ?? '' }}" class="truncate text-[11px] text-stone-600 hover:text-[#6e2f0e]">{{ $company['emails'][0] ?? '—' }}</a>
+                </div>
+                <div class="flex items-center gap-2 px-4 py-2">
+                    <svg class="h-3.5 w-3.5 shrink-0 text-stone-300" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z"/></svg>
+                    <span class="text-[11px] text-stone-600">{{ $company['phones'][0] ?? '—' }}</span>
+                </div>
+            </dl>
+            <div class="border-t border-stone-100 px-4 py-3">
+                <a href="{{ route('home') }}" target="_blank" rel="noreferrer"
+                   class="flex items-center justify-between text-[11px] font-semibold text-stone-600 transition hover:text-[#6e2f0e]">
+                    View public site
+                    <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"/></svg>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- ROW 4 — QUICK ACTIONS (4 equal square tiles) --}}
+<div class="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
+    @php
+        $quickActions = [
+            ['label' => 'Add Product',  'sub' => 'Expand catalogue',       'route' => 'admin.products.create', 'icon' => 'M12 4.5v15m7.5-7.5h-15'],
+            ['label' => 'Write Post',   'sub' => 'Publish news or blog',   'route' => 'admin.news.create',     'icon' => 'm16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z'],
+            ['label' => 'Add Partner',  'sub' => 'Register partner',       'route' => 'admin.partners.create', 'icon' => 'M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z'],
+            ['label' => 'Add Review',   'sub' => 'Post testimonial',       'route' => 'admin.reviews.create',  'icon' => 'M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z'],
+        ];
+    @endphp
+    @foreach ($quickActions as $action)
+        <a href="{{ route($action['route']) }}"
+           class="flex aspect-square flex-col items-center justify-center gap-2 rounded-xl border border-stone-200 bg-white p-4 text-center transition hover:border-stone-300 hover:bg-stone-50">
+            <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-stone-900 text-white">
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="{{ $action['icon'] }}"/>
+                </svg>
+            </div>
+            <div>
+                <p class="text-xs font-bold text-stone-900">{{ $action['label'] }}</p>
+                <p class="mt-0.5 text-[10px] text-stone-400">{{ $action['sub'] }}</p>
+            </div>
+        </a>
+    @endforeach
+</div>
+
+@endsection

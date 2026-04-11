@@ -1,0 +1,335 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Http\Controllers\Admin\ProductsController as AdminProductsController;
+use App\Models\ContactMessage;
+use App\Models\BrickProduct;
+use App\Models\NewsPost;
+use App\Models\Review;
+use App\Support\EditableSiteContent;
+use App\Support\SiteContent;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+
+class SiteController extends Controller
+{
+    public function home()
+    {
+        // DB products for the hero calculator — grouped by category, only active
+        $calcProducts = BrickProduct::active()
+            ->orderBy('category')
+            ->orderBy('name')
+            ->get(['id', 'name', 'category', 'coverage_sqm', 'bricks_per_square_metre', 'weight_kg', 'price_per_brick']);
+
+        $calcCategories = AdminProductsController::CATEGORIES;
+
+        // Use featured approved DB reviews for carousel; fall back to static if none
+        $dbReviews = Review::approved()->where('is_featured', true)->latest()->get();
+        if ($dbReviews->isEmpty()) {
+            $dbReviews = Review::approved()->latest()->take(6)->get();
+        }
+        $testimonials = $dbReviews->isNotEmpty()
+            ? $dbReviews
+            : EditableSiteContent::testimonials();
+
+        return view('site.home', $this->sharedData([
+            'title' => 'Butende Brick Works',
+            'metaDescription' => SiteContent::company()['meta_description'],
+            'blogPosts' => NewsPost::published()->latest('published_at')->take(4)->get(),
+            'calcProducts'    => $calcProducts,
+            'calcCategories'  => $calcCategories,
+            'testimonials'    => $testimonials,
+        ]));
+    }
+
+    public function about()
+    {
+        return view('site.about', $this->sharedData([
+            'title' => 'About Us | Butende Brick Works',
+            'metaDescription' => 'Learn about the mission, vision, and history behind Butende Brick Works and its fired clay manufacturing legacy since 1967.',
+            'talkToUsHeading' => 'Ready to build with us?',
+            'talkToUsBody' => 'Whether you are a developer, architect, or builder — tell us about your project and we will help you find the right product.',
+        ]));
+    }
+
+    public function capabilities()
+    {
+        return view('site.capabilities', $this->sharedData([
+            'title' => 'Products Capabilities | Butende Brick Works',
+            'metaDescription' => 'Explore Butende Brick Works capabilities in fired clay production, custom profiles, project guidance, and institutional supply.',
+            'talkToUsHeading' => 'Have a project in mind?',
+            'talkToUsBody' => 'Tell us about your construction requirements and we will help you find the right product and supply arrangement.',
+        ]));
+    }
+
+    public function products()
+    {
+        $products = BrickProduct::active()
+            ->orderBy('category')
+            ->orderBy('name')
+            ->get();
+
+        $grouped = $products->groupBy('category');
+
+        return view('site.products.index', $this->sharedData([
+            'title' => 'Products | Butende Brick Works',
+            'metaDescription' => 'Browse bricks, floor tiles, decorative bricks, ventilators, and other fired clay products from Butende Brick Works.',
+            'products' => $products,
+            'grouped'  => $grouped,
+            'talkToUsHeading' => 'Interested in our products?',
+            'talkToUsBody' => 'Request product samples, technical specifications, or a quote for any of our fired clay products.',
+        ]));
+    }
+
+    public function productDetail(BrickProduct $product)
+    {
+        abort_if(! $product->is_active, 404);
+
+        $related = BrickProduct::active()
+            ->where('category', $product->category)
+            ->where('id', '!=', $product->id)
+            ->take(4)
+            ->get();
+
+        return view('site.products.show', $this->sharedData([
+            'title'           => $product->name.' | Butende Brick Works',
+            'metaDescription' => $product->description ?? 'View details for '.$product->name.' from Butende Brick Works.',
+            'product'         => $product,
+            'related'         => $related,
+            'talkToUsHeading' => 'Get a quote for '.$product->name,
+            'talkToUsBody'    => 'Tell us your project quantities and we will prepare a tailored quotation for this product.',
+        ]));
+    }
+
+    public function product(string $slug)
+    {
+        $categoryMap = [
+            'bricks'             => 'Bricks',
+            'floor-tiles'        => 'Floor Tiles',
+            'ventilators'        => 'Ventilators',
+            'decorative-bricks'  => 'Decorative Bricks',
+            'other'              => 'Other',
+        ];
+
+        abort_unless(isset($categoryMap[$slug]), 404);
+
+        $categoryName     = $categoryMap[$slug];
+        $categoryProducts = BrickProduct::active()
+            ->where('category', $categoryName)
+            ->orderBy('name')
+            ->get();
+
+        return view('site.products.category', $this->sharedData([
+            'title'            => $categoryName.' | Butende Brick Works',
+            'metaDescription'  => 'Browse our '.$categoryName.' range — fired clay products from Butende Brick Works.',
+            'categoryProducts' => $categoryProducts,
+            'categoryName'     => $categoryName,
+            'categorySlug'     => $slug,
+            'talkToUsHeading'  => 'Interested in our '.$categoryName.'?',
+            'talkToUsBody'     => 'Tell us your project requirements and we will help you find the right product.',
+        ]));
+    }
+
+    public function opportunities()
+    {
+        return view('site.opportunities', $this->sharedData([
+            'title' => 'Opportunities | Butende Brick Works',
+            'metaDescription' => 'See current job, training, partnership, and supply opportunities connected to Butende Brick Works.',
+            'talkToUsHeading' => 'See an opportunity you would like to pursue?',
+            'talkToUsBody' => 'Reach out to discuss supply, partnership, or employment opportunities with the Butende team.',
+        ]));
+    }
+
+    public function faq()
+    {
+        return view('site.faq', $this->sharedData([
+            'title' => 'Frequently Asked Questions | Butende Brick Works',
+            'metaDescription' => 'Answers to common questions about products, ordering, location, and opportunities at Butende Brick Works.',
+            'talkToUsHeading' => 'Still have questions?',
+            'talkToUsBody' => 'If you did not find what you were looking for, send us a message and we will get back to you directly.',
+        ]));
+    }
+
+    public function contact()
+    {
+        return view('site.contact', $this->sharedData([
+            'title' => 'Contact | Butende Brick Works',
+            'metaDescription' => 'Contact Butende Brick Works by phone, email, or visit the factory in Matanga, Masaka, Uganda.',
+            'talkToUsHeading' => 'Send us a message',
+            'talkToUsBody' => 'Fill in the form and the team will respond as quickly as possible.',
+        ]));
+    }
+
+    public function calculator()
+    {
+        $products = BrickProduct::active()->orderBy('category')->orderBy('name')->get();
+
+        return view('site.calculator', $this->sharedData([
+            'title' => 'Products Calculator | Butende Brick Works',
+            'metaDescription' => 'Use our free products calculator to estimate how many bricks or tiles you need for your project and get an instant cost estimate.',
+            'products' => $products,
+        ]));
+    }
+
+    public function storeTalkToUs(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:120'],
+            'email' => ['required', 'email', 'max:160'],
+            'phone' => ['nullable', 'string', 'max:40'],
+            'source_url' => ['nullable', 'string', 'max:255'],
+            'enquiry_type' => ['nullable', 'string', 'max:40'],
+            'product_interest' => ['nullable', 'string', 'max:120'],
+            'project_type' => ['nullable', 'string', 'max:120'],
+            'quantity' => ['nullable', 'string', 'max:120'],
+            'details' => ['nullable', 'string', 'max:5000'],
+        ]);
+
+        $isQuoteRequest = ($validated['enquiry_type'] ?? null) === 'quote';
+
+        if ($isQuoteRequest) {
+            $quoteFields = $request->validate([
+                'product_interest' => ['required', 'string', 'max:120'],
+                'project_type' => ['required', 'string', 'max:120'],
+                'quantity' => ['required', 'string', 'max:120'],
+                'details' => ['nullable', 'string', 'max:5000'],
+            ]);
+
+            $message = collect([
+                'Request type: Quote request',
+                'Product interest: '.$quoteFields['product_interest'],
+                'Project type: '.$quoteFields['project_type'],
+                'Quantity or scope: '.$quoteFields['quantity'],
+                'Phone: '.($validated['phone'] ?: 'Not provided'),
+                'Additional details: '.($quoteFields['details'] ?: 'None provided'),
+            ])->implode("\n");
+
+            ContactMessage::create([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'phone' => $validated['phone'] ?? null,
+                'subject' => 'Request for Quote',
+                'message' => $message,
+                'source_url' => $validated['source_url'] ?? null,
+            ]);
+        } else {
+            $genericFields = $request->validate([
+                'subject' => ['required', 'string', 'max:160'],
+                'message' => ['required', 'string', 'min:10', 'max:5000'],
+            ]);
+
+            ContactMessage::create([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'phone' => $validated['phone'] ?? null,
+                'subject' => $genericFields['subject'],
+                'message' => $genericFields['message'],
+                'source_url' => $validated['source_url'] ?? null,
+            ]);
+        }
+
+        return back()
+            ->with('talk_to_us_success', 'Thanks for reaching out. We have received your message and will get back to you soon.');
+    }
+
+    public function newsList()
+    {
+        $activeCategory = request('category');
+
+        $query = NewsPost::published()->latest('published_at');
+
+        if ($activeCategory) {
+            $query->where('category', $activeCategory);
+        }
+
+        $posts = $query->paginate(12)->withQueryString();
+
+        $categories = NewsPost::published()
+            ->distinct()
+            ->orderBy('category')
+            ->pluck('category');
+
+        return view('site.news.index', $this->sharedData([
+            'title'           => 'News & Publications | Butende Brick Works',
+            'metaDescription' => 'Read the latest news, publications, guides and industry insights from Butende Brick Works.',
+            'posts'           => $posts,
+            'categories'      => $categories,
+            'activeCategory'  => $activeCategory,
+            'talkToUsHeading' => 'Want to stay informed?',
+            'talkToUsBody'    => 'Let us know what topics interest you and we will keep you updated with relevant news and publications.',
+        ]));
+    }
+
+    public function newsShow(string $slug)
+    {
+        $post = NewsPost::published()->where('slug', $slug)->firstOrFail();
+
+        $related = NewsPost::published()
+            ->where('id', '!=', $post->id)
+            ->where('category', $post->category)
+            ->latest('published_at')
+            ->take(3)
+            ->get();
+
+        if ($related->count() < 3) {
+            $related = NewsPost::published()
+                ->where('id', '!=', $post->id)
+                ->latest('published_at')
+                ->take(3)
+                ->get();
+        }
+
+        return view('site.news.show', $this->sharedData([
+            'title'           => $post->title.' | Butende Brick Works',
+            'metaDescription' => $post->excerpt ?? substr(strip_tags($post->content), 0, 160),
+            'post'            => $post,
+            'related'         => $related,
+        ]));
+    }
+
+    private function productCategories(): array
+    {
+        return BrickProduct::active()
+            ->orderBy('category')
+            ->orderBy('name')
+            ->get(['id', 'name', 'category', 'description', 'image'])
+            ->groupBy('category')
+            ->map(function ($items, $category) {
+                $first    = $items->first();
+                $imageUrl = $first->image
+                    ? Storage::disk('public')->url($first->image)
+                    : null;
+
+                return [
+                    'name'    => $category,
+                    'path'    => '/products/'.Str::slug($category),
+                    'tagline' => Str::limit($first->description ?? $category.' products', 80),
+                    'image'   => $imageUrl,
+                ];
+            })
+            ->values()
+            ->toArray();
+    }
+
+    private function sharedData(array $overrides = []): array
+    {
+        return array_merge([
+            'company' => EditableSiteContent::company(),
+            'stats' => EditableSiteContent::stats(),
+            'navigation' => SiteContent::navigation(),
+            'capabilities' => EditableSiteContent::capabilities(),
+            'process' => EditableSiteContent::process(),
+            'productCategories' => $this->productCategories(),
+            'partners' => EditableSiteContent::partners(),
+            'sectors' => SiteContent::sectors(),
+            'testimonials' => EditableSiteContent::testimonials(),
+            'faqs' => SiteContent::faqs(),
+            'opportunities' => SiteContent::opportunities(),
+            'heroSlides' => EditableSiteContent::heroSlides(),
+            'projectsInUse' => EditableSiteContent::projectsInUse(),
+        ], $overrides);
+    }
+}

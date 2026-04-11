@@ -1,0 +1,303 @@
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\BrickProduct;
+use Illuminate\Database\Seeder;
+
+class BrickProductSeeder extends Seeder
+{
+    public function run(): void
+    {
+        $products = [
+
+            // ── BRICKS ────────────────────────────────────────────────────
+            [
+                'name'                    => 'Plain Brick',
+                'category'                => 'Bricks',
+                'description'             => 'A classic fired-clay unit for straightforward walling and timeless brick facades. Uniform colour and texture with excellent weather resistance.',
+                'price_per_brick'         => 350,
+                'bricks_per_square_metre' => 60,
+                'weight_kg'               => 2.50,
+                'dimensions_inch'         => '9 × 4.5 × 3 in',
+                'is_active'               => true,
+            ],
+            [
+                'name'                    => 'Half Brick',
+                'category'                => 'Bricks',
+                'description'             => 'Useful for tight layouts, course adjustments, and neat pattern transitions in masonry work.',
+                'price_per_brick'         => 200,
+                'bricks_per_square_metre' => 120,
+                'weight_kg'               => 1.30,
+                'dimensions_inch'         => '4.5 × 4.5 × 3 in',
+                'is_active'               => true,
+            ],
+            [
+                'name'                    => 'Standard Brick Grooved',
+                'category'                => 'Bricks',
+                'description'             => 'Adds texture and a stronger visual rhythm to exposed masonry work. Same structural properties as the plain brick with a grooved face.',
+                'price_per_brick'         => 370,
+                'bricks_per_square_metre' => 60,
+                'weight_kg'               => 2.50,
+                'dimensions_inch'         => '9 × 4.5 × 3 in',
+                'is_active'               => true,
+            ],
+            [
+                'name'                    => 'Arch Brick',
+                'category'                => 'Bricks',
+                'description'             => 'Special tapered profile that helps resolve curves and arched openings cleanly without cutting.',
+                'price_per_brick'         => 450,
+                'bricks_per_square_metre' => 55,
+                'weight_kg'               => 2.40,
+                'dimensions_inch'         => '9 × 4.5 × 3 in',
+                'is_active'               => true,
+            ],
+            [
+                'name'                    => 'Pillar Brick',
+                'category'                => 'Bricks',
+                'description'             => 'Designed for clean column construction and decorative pillar work. Exposed on all visible faces for a consistent finish.',
+                'price_per_brick'         => 480,
+                'bricks_per_square_metre' => 48,
+                'weight_kg'               => 2.60,
+                'dimensions_inch'         => '9 × 9 × 3 in',
+                'is_active'               => true,
+            ],
+            [
+                'name'                    => 'Corner Brick',
+                'category'                => 'Bricks',
+                'description'             => 'Resolves building corners with a clean, continuous clay finish. Eliminates the need for cutting at external angles.',
+                'price_per_brick'         => 420,
+                'bricks_per_square_metre' => 60,
+                'weight_kg'               => 2.55,
+                'dimensions_inch'         => '9 × 4.5 × 3 in',
+                'is_active'               => true,
+            ],
+            [
+                'name'                    => 'T Brick',
+                'category'                => 'Bricks',
+                'description'             => 'Useful at wall junctions and decorative T-shaped intersections. Keeps coursing aligned at meeting points.',
+                'price_per_brick'         => 430,
+                'bricks_per_square_metre' => 60,
+                'weight_kg'               => 2.55,
+                'dimensions_inch'         => '9 × 4.5 × 3 in',
+                'is_active'               => true,
+            ],
+
+            // ── FLOOR TILES ───────────────────────────────────────────────
+            [
+                'name'                    => 'Standard Floor Tile',
+                'category'                => 'Floor Tiles',
+                'description'             => 'A reliable all-purpose clay tile for indoor and outdoor surfaces. Durable finish suited to active family, institutional, and outdoor spaces.',
+                'price_per_brick'         => 850,
+                'bricks_per_square_metre' => 16,
+                'weight_kg'               => 3.20,
+                'dimensions_inch'         => '12 × 12 × 1 in',
+                'is_active'               => true,
+            ],
+            [
+                'name'                    => 'Courtyard Tile',
+                'category'                => 'Floor Tiles',
+                'description'             => 'A grounded clay finish for transitional spaces around the building edge — courtyards, entrance areas, and covered walkways.',
+                'price_per_brick'         => 900,
+                'bricks_per_square_metre' => 16,
+                'weight_kg'               => 3.30,
+                'dimensions_inch'         => '12 × 12 × 1 in',
+                'is_active'               => true,
+            ],
+            [
+                'name'                    => 'Veranda Tile',
+                'category'                => 'Floor Tiles',
+                'description'             => 'Warm and durable — suited to covered outdoor circulation spaces like verandas and garden pathways.',
+                'price_per_brick'         => 880,
+                'bricks_per_square_metre' => 16,
+                'weight_kg'               => 3.20,
+                'dimensions_inch'         => '12 × 12 × 1 in',
+                'is_active'               => true,
+            ],
+            [
+                'name'                    => 'Interior Floor Tile',
+                'category'                => 'Floor Tiles',
+                'description'             => 'Ideal when you want a natural floor that feels warm, tactile, and enduring. Works in living rooms, corridors, and dining areas.',
+                'price_per_brick'         => 920,
+                'bricks_per_square_metre' => 16,
+                'weight_kg'               => 3.20,
+                'dimensions_inch'         => '12 × 12 × 1 in',
+                'is_active'               => true,
+            ],
+            [
+                'name'                    => 'Quarry Tile',
+                'category'                => 'Floor Tiles',
+                'description'             => 'Sized and finished to handle movement, weather, and repeated use. An excellent choice for commercial kitchens, schools, and workshops.',
+                'price_per_brick'         => 950,
+                'bricks_per_square_metre' => 16,
+                'weight_kg'               => 3.50,
+                'dimensions_inch'         => '12 × 12 × 1.25 in',
+                'is_active'               => true,
+            ],
+
+            // ── DECORATIVE BRICKS ─────────────────────────────────────────
+            [
+                'name'                    => 'Double Pompe',
+                'category'                => 'Decorative Bricks',
+                'description'             => 'Pattern-led units that create expressive masonry and screen effects. Ideal for feature walls, facade screens, and patterned ventilation zones.',
+                'price_per_brick'         => 550,
+                'bricks_per_square_metre' => 40,
+                'weight_kg'               => 2.00,
+                'dimensions_inch'         => '9 × 4.5 × 3 in',
+                'is_active'               => true,
+            ],
+            [
+                'name'                    => 'Malta',
+                'category'                => 'Decorative Bricks',
+                'description'             => 'A refined decorative profile suited to feature walls and facades. Creates elegant ventilation and shadow effects in warm climates.',
+                'price_per_brick'         => 520,
+                'bricks_per_square_metre' => 40,
+                'weight_kg'               => 1.90,
+                'dimensions_inch'         => '9 × 4.5 × 3 in',
+                'is_active'               => true,
+            ],
+            [
+                'name'                    => 'Malta II',
+                'category'                => 'Decorative Bricks',
+                'description'             => 'A variation of the Malta profile for richer patterned arrangements. Pairs naturally with the Malta brick for layered screen effects.',
+                'price_per_brick'         => 530,
+                'bricks_per_square_metre' => 40,
+                'weight_kg'               => 1.90,
+                'dimensions_inch'         => '9 × 4.5 × 3 in',
+                'is_active'               => true,
+            ],
+            [
+                'name'                    => 'Single Pompe',
+                'category'                => 'Decorative Bricks',
+                'description'             => 'Elegant single-unit screening for ventilation and visual texture. Effective when used at regular intervals across a facade.',
+                'price_per_brick'         => 500,
+                'bricks_per_square_metre' => 40,
+                'weight_kg'               => 1.80,
+                'dimensions_inch'         => '9 × 4.5 × 3 in',
+                'is_active'               => true,
+            ],
+            [
+                'name'                    => 'Spina',
+                'category'                => 'Decorative Bricks',
+                'description'             => 'A spine-like profile that adds rhythm and shadow to any exposed surface. Works well on external facades and boundary walls.',
+                'price_per_brick'         => 510,
+                'bricks_per_square_metre' => 44,
+                'weight_kg'               => 1.85,
+                'dimensions_inch'         => '9 × 4.5 × 3 in',
+                'is_active'               => true,
+            ],
+
+            // ── VENTILATORS ───────────────────────────────────────────────
+            [
+                'name'                    => 'Star Ventilator',
+                'category'                => 'Ventilators',
+                'description'             => 'A star-patterned unit that combines strong airflow with decorative appeal. Suits gable ends, upper wall sections, and boundary walls.',
+                'price_per_brick'         => 600,
+                'bricks_per_square_metre' => 10,
+                'weight_kg'               => 1.60,
+                'dimensions_inch'         => '9 × 9 × 3 in',
+                'is_active'               => true,
+            ],
+            [
+                'name'                    => 'O Ventilator',
+                'category'                => 'Ventilators',
+                'description'             => 'Circular openings for smooth, even air distribution across wall sections. Clean and minimal in appearance.',
+                'price_per_brick'         => 580,
+                'bricks_per_square_metre' => 10,
+                'weight_kg'               => 1.55,
+                'dimensions_inch'         => '9 × 9 × 3 in',
+                'is_active'               => true,
+            ],
+            [
+                'name'                    => 'Malta Ventilator',
+                'category'                => 'Ventilators',
+                'description'             => 'Best where airflow needs to be part of the building expression. Matches the Malta decorative brick palette for a consistent look.',
+                'price_per_brick'         => 590,
+                'bricks_per_square_metre' => 10,
+                'weight_kg'               => 1.60,
+                'dimensions_inch'         => '9 × 9 × 3 in',
+                'is_active'               => true,
+            ],
+            [
+                'name'                    => 'Quarter Circle Ventilator',
+                'category'                => 'Ventilators',
+                'description'             => 'Curved units that work well at corners and arched wall sections. Useful for resolving ventilation at building intersections.',
+                'price_per_brick'         => 620,
+                'bricks_per_square_metre' => 10,
+                'weight_kg'               => 1.50,
+                'dimensions_inch'         => '9 × 9 × 3 in',
+                'is_active'               => true,
+            ],
+            [
+                'name'                    => 'X Ventilator',
+                'category'                => 'Ventilators',
+                'description'             => 'A crisp geometric pattern that balances airflow and visual texture. Works on both interior and exterior walls.',
+                'price_per_brick'         => 600,
+                'bricks_per_square_metre' => 10,
+                'weight_kg'               => 1.60,
+                'dimensions_inch'         => '9 × 9 × 3 in',
+                'is_active'               => true,
+            ],
+
+            // ── OTHER PRODUCTS ────────────────────────────────────────────
+            [
+                'name'                    => 'Roofing Tile I',
+                'category'                => 'Other',
+                'description'             => 'Clay roofing pieces for projects that want continuity from wall to roof. Durable fired clay for weatherproofing sloped roofs.',
+                'price_per_brick'         => 1200,
+                'bricks_per_square_metre' => 12,
+                'weight_kg'               => 3.80,
+                'dimensions_inch'         => '12 × 8 × 1.5 in',
+                'is_active'               => true,
+            ],
+            [
+                'name'                    => 'Roofing Tile II',
+                'category'                => 'Other',
+                'description'             => 'A complementary roofing profile for varied roof layouts and ridges.',
+                'price_per_brick'         => 1250,
+                'bricks_per_square_metre' => 12,
+                'weight_kg'               => 3.90,
+                'dimensions_inch'         => '12 × 8 × 1.5 in',
+                'is_active'               => true,
+            ],
+            [
+                'name'                    => 'Max Pan',
+                'category'                => 'Other',
+                'description'             => 'A pan-style roofing tile for broad coverage and clean ridge lines. Good for pitched roofs on homes and institutional buildings.',
+                'price_per_brick'         => 1300,
+                'bricks_per_square_metre' => 10,
+                'weight_kg'               => 4.20,
+                'dimensions_inch'         => '14 × 9 × 1.5 in',
+                'is_active'               => true,
+            ],
+            [
+                'name'                    => 'Clay Stove',
+                'category'                => 'Other',
+                'description'             => 'Fired clay cooking stoves built for efficiency and everyday household use. Reduces fuel consumption compared to open fires.',
+                'price_per_brick'         => 45000,
+                'bricks_per_square_metre' => 1,
+                'weight_kg'               => 8.00,
+                'dimensions_inch'         => null,
+                'is_active'               => true,
+            ],
+            [
+                'name'                    => 'Partitioning Block',
+                'category'                => 'Other',
+                'description'             => 'Useful where lightweight internal division is required. Lower weight than a standard brick and faster to lay in partition walls.',
+                'price_per_brick'         => 380,
+                'bricks_per_square_metre' => 20,
+                'weight_kg'               => 1.80,
+                'dimensions_inch'         => '9 × 4.5 × 2 in',
+                'is_active'               => true,
+            ],
+        ];
+
+        foreach ($products as $data) {
+            BrickProduct::updateOrCreate(
+                ['name' => $data['name'], 'category' => $data['category']],
+                $data
+            );
+        }
+    }
+}
+
