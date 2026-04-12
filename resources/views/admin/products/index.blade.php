@@ -69,6 +69,9 @@
             <table class="w-full text-left text-sm">
                 <thead>
                     <tr class="border-b border-[#ead7c9] bg-[#fff9f4]">
+                        <th class="w-8 px-2 py-3.5">
+                            <input type="checkbox" id="select-all-products" onclick="document.querySelectorAll('.product-checkbox').forEach(cb => cb.checked = this.checked)">
+                        </th>
                         <th class="w-16 px-4 py-3.5 text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">Image</th>
                         <th class="px-4 py-3.5 text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">Product</th>
                         <th class="hidden px-4 py-3.5 text-xs font-semibold uppercase tracking-[0.18em] text-stone-500 md:table-cell">Category</th>
