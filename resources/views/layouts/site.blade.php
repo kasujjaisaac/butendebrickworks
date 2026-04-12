@@ -320,18 +320,20 @@
                             </div>
 
                             {{-- Col 2: Links (2×2 sub-grid) --}}
-                            <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-2 xl:gap-6 2xl:grid-cols-4">
+                            <div class="w-full max-w-7xl mx-auto grid grid-cols-2 gap-6 lg:grid-cols-4">
+                                <!-- Main Pages -->
                                 <div>
                                     <h2 class="footer-heading">Main Pages</h2>
-                                    <div class="mt-5 grid gap-3">
+                                    <div class="mt-5 flex flex-col gap-2">
                                         @foreach ($mainLinks as $link)
                                             <a href="{{ $link['path'] }}" class="footer-link">{{ $link['label'] }}</a>
                                         @endforeach
                                     </div>
                                 </div>
+                                <!-- Products -->
                                 <div>
                                     <h2 class="footer-heading">Products</h2>
-                                    <div class="mt-5 grid gap-3">
+                                    <div class="mt-5 flex flex-col gap-2">
                                         @php
                                             $productNavLinks = collect($navigation)->firstWhere('label', 'Products')['children'] ?? [];
                                         @endphp
@@ -340,17 +342,19 @@
                                         @endforeach
                                     </div>
                                 </div>
+                                <!-- Support -->
                                 <div>
                                     <h2 class="footer-heading">Support</h2>
-                                    <div class="mt-5 grid gap-3">
+                                    <div class="mt-5 flex flex-col gap-2">
                                         @foreach ($opportunityLinks as $link)
                                             <a href="{{ $link['path'] }}" class="footer-link">{{ $link['label'] }}</a>
                                         @endforeach
                                     </div>
                                 </div>
+                                <!-- Hours -->
                                 <div>
                                     <h2 class="footer-heading">Hours</h2>
-                                    <div class="mt-5 space-y-2 text-sm text-white/65">
+                                    <div class="mt-5 flex flex-col gap-2 text-sm text-white/65">
                                         <p>{{ $company['hours'] }}</p>
                                         <p class="mt-3 text-xs text-white/45">Closed on Sundays and public holidays.</p>
                                     </div>

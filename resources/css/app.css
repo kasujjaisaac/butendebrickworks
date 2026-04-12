@@ -521,7 +521,7 @@
     align-items: center;
     justify-content: center;
     padding: 1.25rem 1rem;
-    border: 7px solid rgba(109,56,32,0.20);
+    border: 1.5px solid rgba(109,56,32,0.20);
     background: #fff;
     border-radius: 2px;
     transition: all 0.25s ease;

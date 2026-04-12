@@ -84,7 +84,7 @@
                                     <option value="" style="background:#3d1505">— Choose a category —</option>
                                     @foreach ($availableCategories as $cat)
                                         @if ($groupedProducts->get($cat, collect())->isNotEmpty())
-                                            <option value="{{ $cat }}" style="background:#3d1505">{{ $cat }}</option>
+                                            <option value="{{ trim($cat) }}" style="background:#3d1505">{{ $cat }}</option>
                                         @endif
                                     @endforeach
                                 </select>
@@ -216,7 +216,8 @@ function heroCalc(products) {
 
         get filteredProducts() {
             if (!this.category) return [];
-            return this.products.filter(p => p.category === this.category);
+            const selectedCat = (this.category || '').toString().trim().toLowerCase();
+            return this.products.filter(p => (p.category || '').toString().trim().toLowerCase() === selectedCat);
         },
 
         setProductById() {
@@ -300,13 +301,15 @@ function heroCalc(products) {
                     @endforeach
                 </div>
                 <div class="mt-8 flex flex-wrap gap-4">
-                    <div class="flex items-center gap-3 rounded-sm border border-[#b86033]/15 bg-[#b86033]/5 px-5 py-3">
-                        <span class="text-2xl font-bold text-[#b86033]">{{ $company['years'] }}</span>
-                        <span class="text-sm text-stone-600">Years of service</span>
-                    </div>
-                    <div class="flex items-center gap-3 rounded-sm border border-[#b86033]/15 bg-[#b86033]/5 px-5 py-3">
-                        <span class="text-2xl font-bold text-[#b86033]">{{ $company['founded'] }}</span>
-                        <span class="text-sm text-stone-600">Year established</span>
+                    <div class="flex flex-row gap-4 w-full sm:w-auto">
+                        <div class="flex flex-1 items-center gap-3 rounded-sm border border-[#b86033]/15 bg-[#b86033]/5 px-5 py-3 justify-center">
+                            <span class="text-2xl font-bold text-[#b86033]">{{ $company['years'] }}</span>
+                            <span class="text-sm text-stone-600">Years of service</span>
+                        </div>
+                        <div class="flex flex-1 items-center gap-3 rounded-sm border border-[#b86033]/15 bg-[#b86033]/5 px-5 py-3 justify-center">
+                            <span class="text-2xl font-bold text-[#b86033]">{{ $company['founded'] }}</span>
+                            <span class="text-sm text-stone-600">Year established</span>
+                        </div>
                     </div>
                 </div>
             </div>
