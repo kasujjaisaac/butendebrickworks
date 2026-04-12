@@ -1,6 +1,6 @@
 @php
     $showCategory = $showCategory ?? false;
-    $imageUrl = $product->image ? '/images/products/' . basename($product->image) : null;
+    $imageUrl = $product->image ? '/images/products/' . $product->image : null;
     $priceLabel = $product->price_per_brick
         ? 'UGX '.number_format($product->price_per_brick, 0)
         : 'Quote on request';
