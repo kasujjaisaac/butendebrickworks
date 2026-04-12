@@ -56,9 +56,9 @@
             <div class="lg:col-span-3">
                 @if ($product->image)
                     <div class="overflow-hidden border border-stone-200 shadow-sm">
-                        <img src="{{ Storage::url($product->image) }}"
-                             alt="{{ $product->name }}"
-                             class="aspect-[4/3] w-full object-cover">
+                            <img src="{{ asset('images/products/' . basename($product->image)) }}"
+                                 alt="{{ $product->name }}"
+                                 class="aspect-[4/3] w-full object-cover">
                     </div>
                 @else
                     <div class="flex aspect-[4/3] w-full items-center justify-center border border-stone-200 bg-gradient-to-br from-stone-100 to-stone-200">

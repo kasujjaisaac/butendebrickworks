@@ -66,25 +66,25 @@
                 </a>
             </div>
         @else
-            <table class="w-full text-left text-sm">
-                <thead>
-                    <tr class="border-b border-[#ead7c9] bg-[#fff9f4]">
-                        <th class="w-8 px-2 py-3.5">
-                            <input type="checkbox" id="select-all-products" onclick="document.querySelectorAll('.product-checkbox').forEach(cb => cb.checked = this.checked)">
-                        </th>
-                        <th class="w-16 px-4 py-3.5 text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">Image</th>
-                        <th class="px-4 py-3.5 text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">Product</th>
-                        <th class="hidden px-4 py-3.5 text-xs font-semibold uppercase tracking-[0.18em] text-stone-500 md:table-cell">Category</th>
-                        <th class="hidden px-4 py-3.5 text-xs font-semibold uppercase tracking-[0.18em] text-stone-500 lg:table-cell">Dimensions</th>
-                        <th class="hidden px-4 py-3.5 text-xs font-semibold uppercase tracking-[0.18em] text-stone-500 lg:table-cell">Weight</th>
-                        <th class="hidden px-4 py-3.5 text-xs font-semibold uppercase tracking-[0.18em] text-stone-500 lg:table-cell">Coverage</th>
-                        <th class="px-4 py-3.5 text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">Status</th>
-                        <th class="px-4 py-3.5"></th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-[#f0e8e1]">
-                    <form id="bulk-action-form" method="POST" action="{{ route('admin.products.bulk-delete') }}" onsubmit="return confirm('Delete selected products? This cannot be undone.')">
-                    @csrf
+            <form id="bulk-action-form" method="POST" action="{{ route('admin.products.bulk-delete') }}" onsubmit="return confirm('Delete selected products? This cannot be undone.')">
+                @csrf
+                <table class="w-full text-left text-sm">
+                    <thead>
+                        <tr class="border-b border-[#ead7c9] bg-[#fff9f4]">
+                            <th class="w-8 px-2 py-3.5">
+                                <input type="checkbox" id="select-all-products" onclick="document.querySelectorAll('.product-checkbox').forEach(cb => cb.checked = this.checked)">
+                            </th>
+                            <th class="w-16 px-4 py-3.5 text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">Image</th>
+                            <th class="px-4 py-3.5 text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">Product</th>
+                            <th class="hidden px-4 py-3.5 text-xs font-semibold uppercase tracking-[0.18em] text-stone-500 md:table-cell">Category</th>
+                            <th class="hidden px-4 py-3.5 text-xs font-semibold uppercase tracking-[0.18em] text-stone-500 lg:table-cell">Dimensions</th>
+                            <th class="hidden px-4 py-3.5 text-xs font-semibold uppercase tracking-[0.18em] text-stone-500 lg:table-cell">Weight</th>
+                            <th class="hidden px-4 py-3.5 text-xs font-semibold uppercase tracking-[0.18em] text-stone-500 lg:table-cell">Coverage</th>
+                            <th class="px-4 py-3.5 text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">Status</th>
+                            <th class="px-4 py-3.5"></th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-[#f0e8e1]">
                     @foreach ($products as $product)
                         <tr class="transition hover:bg-[#fff7f2]">
                             <td class="px-2 py-3 text-center">
@@ -92,7 +92,7 @@
                             </td>
                             <td class="px-4 py-3">
                                 @if ($product->image)
-                                    <img src="{{ Storage::url($product->image) }}" alt="{{ $product->name }}"
+                                     <img src="{{ asset('images/products/' . basename($product->image)) }}" alt="{{ $product->name }}"
                                          class="h-12 w-12 rounded-md object-cover border border-stone-200">
                                 @else
                                     <div class="flex h-12 w-12 items-center justify-center rounded-md bg-stone-100 text-stone-400">
@@ -129,7 +129,8 @@
                                 @endif
                             </td>
                             <td class="px-4 py-3">
-                                <form method="POST" action="{{ route('admin.products.toggle-active', $product) }}">
+                                <!-- Toggle active form (not nested in bulk form) -->
+                                <form method="POST" action="{{ route('admin.products.toggle-active', $product) }}" style="display:inline">
                                     @csrf @method('PATCH')
                                     <button type="submit"
                                             class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold transition
@@ -146,8 +147,8 @@
                                         <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z"/></svg>
                                         Edit
                                     </a>
-                                    <form method="POST" action="{{ route('admin.products.destroy', $product) }}"
-                                          onsubmit="return confirm('Delete this product? This cannot be undone.')">
+                                    <!-- Delete form (not nested in bulk form) -->
+                                    <form method="POST" action="{{ route('admin.products.destroy', $product) }}" style="display:inline" onsubmit="return confirm('Delete this product? This cannot be undone.')">
                                         @csrf @method('DELETE')
                                         <button type="submit" class="inline-flex items-center gap-1 rounded-sm border border-red-200 px-3 py-1.5 text-xs font-medium text-red-600 transition hover:bg-red-50">
                                             <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"/></svg>
@@ -166,9 +167,9 @@
                                 </button>
                             </td>
                         </tr>
-                    </form>
-                </tbody>
-            </table>
+                    </tbody>
+                </table>
+            </form>
 
             @if ($products->hasPages())
                 <div class="border-t border-[#ead7c9] px-5 py-4">

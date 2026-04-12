@@ -13,7 +13,7 @@ class ProductsController extends Controller
 {
     public function bulkDelete(Request $request): RedirectResponse
     {
-        $ids = $request->input('selected', []);
+        $ids = $request->input('selected_products', []);
         if (!is_array($ids) || empty($ids)) {
             return redirect()->route('admin.products.index')
                 ->with('error', 'No products selected for deletion.');

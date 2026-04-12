@@ -107,8 +107,8 @@
                 {{-- Current image (edit mode) --}}
                 @if (! empty($product->image))
                     <div>
-                        <img src="{{ Storage::url($product->image) }}" alt="{{ $product->name }}"
-                             class="h-44 w-full rounded-lg object-cover border border-[#e8d5c5]">
+                            <img src="{{ asset('images/products/' . basename($product->image)) }}" alt="{{ $product->name }}"
+                                 class="h-44 w-full rounded-lg object-cover border border-[#e8d5c5]">
                         <p class="mt-1.5 text-center text-xs text-stone-400">Current image — upload below to replace</p>
                     </div>
                 @endif
