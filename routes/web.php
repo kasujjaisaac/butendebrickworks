@@ -72,6 +72,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::put('/products/{product}', [ProductsController::class, 'update'])->name('products.update');
     Route::delete('/products/{product}', [ProductsController::class, 'destroy'])->name('products.destroy');
     Route::patch('/products/{product}/toggle-active', [ProductsController::class, 'toggleActive'])->name('products.toggle-active');
+    Route::post('/products/bulk-delete', [ProductsController::class, 'bulkDelete'])->name('products.bulk-delete');
 
     // News & Blog
     Route::get('/news', [NewsController::class, 'index'])->name('news.index');

@@ -11,6 +11,27 @@ use Illuminate\View\View;
 
 class ProductsController extends Controller
 {
+    public function bulkDelete(Request $request): RedirectResponse
+    {
+        $ids = $request->input('selected', []);
+        if (!is_array($ids) || empty($ids)) {
+            return redirect()->route('admin.products.index')
+                ->with('error', 'No products selected for deletion.');
+        }
+
+        $products = BrickProduct::whereIn('id', $ids)->get();
+        $deletedCount = 0;
+        foreach ($products as $product) {
+            if ($product->image) {
+                Storage::disk('public')->delete($product->image);
+            }
+            $product->delete();
+            $deletedCount++;
+        }
+
+        return redirect()->route('admin.products.index')
+            ->with('success', $deletedCount . ' product(s) deleted.');
+    }
     public const CATEGORIES = [
         'Bricks',
         'Floor Tiles',
