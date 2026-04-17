@@ -54,6 +54,12 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::put('/home/company', [HomeContentController::class, 'updateCompany'])->name('home.company.update');
     Route::put('/home/stats', [HomeContentController::class, 'updateStats'])->name('home.stats.update');
     Route::put('/home/capabilities', [HomeContentController::class, 'updateCapabilities'])->name('home.capabilities.update');
+    Route::get('/home/projects-in-use', [HomeContentController::class, 'indexProjectsInUse'])->name('home.projects-in-use.index');
+    Route::get('/home/projects-in-use/create', [HomeContentController::class, 'createProject'])->name('home.projects-in-use.create');
+    Route::post('/home/projects-in-use', [HomeContentController::class, 'storeProject'])->name('home.projects-in-use.store');
+    Route::get('/home/projects-in-use/{index}/edit', [HomeContentController::class, 'editProject'])->name('home.projects-in-use.edit');
+    Route::put('/home/projects-in-use/{index}', [HomeContentController::class, 'updateProject'])->name('home.projects-in-use.update');
+    Route::delete('/home/projects-in-use/{index}', [HomeContentController::class, 'destroyProject'])->name('home.projects-in-use.destroy');
     Route::put('/home/process', [HomeContentController::class, 'updateProcess'])->name('home.process.update');
     Route::put('/home/hero-slides', [HomeContentController::class, 'updateHeroSlides'])->name('home.hero-slides.update');
     Route::put('/home/testimonials', [HomeContentController::class, 'updateTestimonials'])->name('home.testimonials.update');

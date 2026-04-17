@@ -28,6 +28,125 @@ class HomeContentController extends Controller
         ]);
     }
 
+    public function indexProjectsInUse(): View
+    {
+        return view('admin.home.projects-in-use.index', [
+            'pageTitle' => 'Product Capabilities Gallery',
+            'projectsInUse' => EditableSiteContent::projectsInUse(),
+        ]);
+    }
+
+    public function createProject(): View
+    {
+        return view('admin.home.projects-in-use.create', [
+            'pageTitle' => 'Add Project',
+        ]);
+    }
+
+    public function storeProject(Request $request): RedirectResponse
+    {
+        $this->validateUploadFile($request, 'image_upload');
+
+        $validated = $request->validate([
+            'image_upload' => ['required', 'file', 'image', 'max:6144'],
+            'caption' => ['required', 'string', 'max:200'],
+            'product' => ['required', 'string', 'max:100'],
+            'category' => ['required', 'string', 'max:100'],
+            'tag' => ['required', 'string', 'max:100'],
+            'span' => ['nullable', 'string', 'in:normal,wide'],
+        ]);
+
+        $projects = EditableSiteContent::projectsInUse();
+
+        $imagePath = $this->storePublicImage($request->file('image_upload'));
+
+        $projects[] = [
+            'image' => $imagePath,
+            'caption' => $validated['caption'],
+            'product' => $validated['product'],
+            'category' => $validated['category'],
+            'tag' => $validated['tag'],
+            'span' => $validated['span'] ?? 'normal',
+        ];
+
+        $this->storeSetting('projects_in_use', $projects);
+
+        return redirect()->route('admin.home.projects-in-use.index')->with('status', 'Project added successfully.');
+    }
+
+    public function editProject(int $index): View
+    {
+        $projects = EditableSiteContent::projectsInUse();
+
+        if (!isset($projects[$index])) {
+            abort(404);
+        }
+
+        return view('admin.home.projects-in-use.edit', [
+            'pageTitle' => 'Edit Project',
+            'project' => $projects[$index],
+            'index' => $index,
+        ]);
+    }
+
+    public function updateProject(Request $request, int $index): RedirectResponse
+    {
+        $this->validateUploadFile($request, 'image_upload');
+
+        $validated = $request->validate([
+            'image_upload' => ['sometimes', 'file', 'image', 'max:6144'],
+            'image' => ['nullable', 'string', 'max:500'],
+            'caption' => ['required', 'string', 'max:200'],
+            'product' => ['required', 'string', 'max:100'],
+            'category' => ['required', 'string', 'max:100'],
+            'tag' => ['required', 'string', 'max:100'],
+            'span' => ['nullable', 'string', 'in:normal,wide'],
+        ]);
+
+        $projects = EditableSiteContent::projectsInUse();
+
+        if (!isset($projects[$index])) {
+            abort(404);
+        }
+
+        $imagePath = $validated['image'] ?? $projects[$index]['image'];
+
+        if ($request->hasFile('image_upload')) {
+            $imagePath = $this->storePublicImage($request->file('image_upload'), $imagePath);
+        }
+
+        $projects[$index] = [
+            'image' => $imagePath,
+            'caption' => $validated['caption'],
+            'product' => $validated['product'],
+            'category' => $validated['category'],
+            'tag' => $validated['tag'],
+            'span' => $validated['span'] ?? 'normal',
+        ];
+
+        $this->storeSetting('projects_in_use', $projects);
+
+        return redirect()->route('admin.home.projects-in-use.index')->with('status', 'Project updated successfully.');
+    }
+
+    public function destroyProject(int $index): RedirectResponse
+    {
+        $projects = EditableSiteContent::projectsInUse();
+
+        if (!isset($projects[$index])) {
+            abort(404);
+        }
+
+        $this->deleteStoredPublicImage($projects[$index]['image']);
+
+        unset($projects[$index]);
+        $projects = array_values($projects); // reindex
+
+        $this->storeSetting('projects_in_use', $projects);
+
+        return redirect()->route('admin.home.projects-in-use.index')->with('status', 'Project deleted successfully.');
+    }
+
     public function updateCompany(Request $request): RedirectResponse
     {
         $validated = $request->validate([
@@ -54,7 +173,7 @@ class HomeContentController extends Controller
             'map_url' => ['nullable', 'url', 'max:255'],
             'map_embed' => ['nullable', 'url', 'max:500'],
             'meta_description' => ['required', 'string', 'max:500'],
-            'logo_upload' => ['nullable', 'image', 'max:4096'],
+            'logo_upload' => ['nullable', 'image', 'max:6144'],
             'hero_image_upload' => ['nullable', 'image', 'max:6144'],
             'about_image_upload' => ['nullable', 'image', 'max:6144'],
         ]);
@@ -254,6 +373,8 @@ class HomeContentController extends Controller
         return back()->with('status', 'Client and partner entries updated.');
     }
 
+
+
     private function storeSetting(string $key, array $value): void
     {
         SiteSetting::putValue($key, $value);
@@ -318,6 +439,39 @@ class HomeContentController extends Controller
         }
 
         return $socials;
+    }
+
+    private function validateUploadFile(Request $request, string $input): void
+    {
+        if ($request->hasFile($input)) {
+            $file = $request->file($input);
+
+            if (! $file->isValid()) {
+                throw ValidationException::withMessages([
+                    $input => $file->getErrorMessage() ?: 'The uploaded file could not be processed.',
+                ]);
+            }
+
+            return;
+        }
+
+        if (isset($_FILES[$input]) && is_array($_FILES[$input]) && ($_FILES[$input]['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_NO_FILE) {
+            throw ValidationException::withMessages([
+                $input => $this->fileUploadErrorMessage($_FILES[$input]['error']),
+            ]);
+        }
+    }
+
+    private function fileUploadErrorMessage(int $errorCode): string
+    {
+        return match ($errorCode) {
+            UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE => 'The uploaded image is too large. Please use a smaller file.',
+            UPLOAD_ERR_PARTIAL => 'The uploaded image was only partially uploaded.',
+            UPLOAD_ERR_NO_TMP_DIR => 'Missing a temporary folder for uploads.',
+            UPLOAD_ERR_CANT_WRITE => 'Failed to write uploaded image to disk.',
+            UPLOAD_ERR_EXTENSION => 'A PHP extension stopped the file upload.',
+            default => 'The image upload failed to upload.',
+        };
     }
 
     private function storePublicImage(UploadedFile $file, ?string $currentPath = null): string

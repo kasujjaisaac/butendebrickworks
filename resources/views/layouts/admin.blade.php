@@ -74,7 +74,19 @@
                         Dashboard
                     </a>
 
-                    {{-- 2. PRODUCTS --}}
+                    @php $capabilitiesOpen = request()->routeIs('admin.home.projects-in-use.*'); @endphp
+                    <a
+                        href="{{ route('admin.home.projects-in-use.index') }}"
+                        class="group flex items-center gap-3 rounded-lg px-3.5 py-2.5 text-[13px] font-medium transition
+                            {{ $capabilitiesOpen ? 'bg-white/15 text-white shadow-sm' : 'text-white/70 hover:bg-white/10 hover:text-white' }}"
+                    >
+                        <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-md {{ $capabilitiesOpen ? 'bg-white/20' : 'bg-white/8 group-hover:bg-white/15' }} transition">
+                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 19.5h15M4.5 5.25h15M4.5 12h15"/></svg>
+                        </span>
+                        Capabilities Gallery
+                    </a>
+
+                    {{-- 3. PRODUCTS --}}
                     @php $productsOpen = $inGroup(['admin.products.*']); @endphp
                     <a
                         href="{{ route('admin.products.index') }}"
@@ -87,7 +99,7 @@
                         Products
                     </a>
 
-                    {{-- 3. QUOTATIONS --}}
+                    {{-- 4. QUOTATIONS --}}
                     @php $quotesOpen = $inGroup(['admin.quotations.*']); @endphp
                     <a
                         href="{{ route('admin.quotations.index') }}"

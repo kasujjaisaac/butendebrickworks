@@ -22,72 +22,39 @@
     </section>
 
     {{-- ===== PRODUCTS IN USE ===== --}}
-    <script type="application/json" id="projects-data">@json($projectsInUse)</script>
+    @if($projectsInUse)
+        @php $project = $projectsInUse[0]; @endphp
+        <script type="application/json" id="projects-data">@json([$project])</script>
 
-    <div
-        x-data="projectGallery()"
-        @keydown.escape.window="close()"
-        @keydown.arrow-left.window="if(lightbox) step(-1)"
-        @keydown.arrow-right.window="if(lightbox) step(1)"
-    >
+        <div
+            x-data="projectGallery()"
+            @keydown.escape.window="close()"
+            @keydown.arrow-left.window="if(lightbox) step(-1)"
+            @keydown.arrow-right.window="if(lightbox) step(1)"
+        >
 
-        {{-- Gallery section --}}
-        <section class="bg-stone-50 py-16">
-            <div class="page-grid">
+            {{-- Gallery section --}}
+            <section class="bg-stone-50 py-16">
+                <div class="page-grid">
 
-                {{-- Section heading --}}
-                <div class="max-w-2xl">
-                    <span class="eyebrow-light">Products in use</span>
-                    <h2 class="section-title mt-5">What our products have built.</h2>
-                    <p class="mt-4 text-base leading-7 text-stone-600">Real projects across the Greater Masaka Region — homes, schools, churches, and community buildings constructed with Butende fired clay products.</p>
-                </div>
+                    {{-- Section heading --}}
+                    <div class="max-w-2xl">
+                        <span class="eyebrow-light">Products in use</span>
+                        <h2 class="section-title mt-5">What our products have built.</h2>
+                        <p class="mt-4 text-base leading-7 text-stone-600">Real projects across the Greater Masaka Region — homes, schools, churches, and community buildings constructed with Butende fired clay products.</p>
+                    </div>
 
-                {{-- Filter tabs --}}
-                @php
-                    $categories = ['All', ...array_values(array_unique(array_column($projectsInUse, 'category')))];
-                @endphp
-                <div class="mt-8 flex flex-wrap gap-2" role="group" aria-label="Filter projects by category">
-                    @foreach ($categories as $cat)
-                        <button
-                            type="button"
-                            @click="activeFilter = '{{ $cat }}'"
-                            :class="activeFilter === '{{ $cat }}'
-                                ? 'bg-[#b86033] text-white border-[#b86033]'
-                                : 'bg-white text-stone-600 border-stone-200 hover:border-stone-300 hover:bg-stone-50'"
-                            class="rounded-sm border px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] transition duration-150"
-                        >{{ $cat }}</button>
-                    @endforeach
-                </div>
-
-                {{-- Photo grid --}}
-                @php
-                    $aspectCycle = ['aspect-[16/9]', 'aspect-[4/3]', 'aspect-[3/2]'];
-                    $normalIdx   = 0;
-                @endphp
-                <div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                    @foreach ($projectsInUse as $index => $project)
-                        @php
-                            $isWide      = ($project['span'] ?? 'normal') === 'wide';
-                            $spanClass   = $isWide ? 'sm:col-span-2 lg:col-span-3' : '';
-                            $aspectClass = $isWide ? 'aspect-[21/9]' : $aspectCycle[$normalIdx % 3];
-                            if (! $isWide) { $normalIdx++; }
-                        @endphp
+                    {{-- Single project display --}}
+                    <div class="mt-8">
                         <article
-                            class="group relative overflow-hidden rounded-sm bg-stone-200 cursor-pointer {{ $spanClass }}"
-                            x-show="activeFilter === 'All' || activeFilter === '{{ $project['category'] }}'"
-                            x-transition:enter="transition-opacity duration-300"
-                            x-transition:enter-start="opacity-0"
-                            x-transition:enter-end="opacity-100"
-                            x-transition:leave="transition-opacity duration-150"
-                            x-transition:leave-start="opacity-100"
-                            x-transition:leave-end="opacity-0"
-                            @click="openLightbox({{ $index }})"
-                            @keydown.enter="openLightbox({{ $index }})"
+                            class="group relative overflow-hidden rounded-sm bg-stone-200 cursor-pointer max-w-md mx-auto"
+                            @click="openLightbox(0)"
+                            @keydown.enter="openLightbox(0)"
                             role="button"
                             tabindex="0"
                             aria-label="View photo: {{ $project['caption'] }}"
                         >
-                            <div class="{{ $aspectClass }} overflow-hidden">
+                            <div class="aspect-[4/3] overflow-hidden">
                                 <img
                                     src="{{ $project['image'] }}"
                                     alt="{{ $project['caption'] }}"
@@ -107,93 +74,72 @@
                             {{-- Bottom caption strip --}}
                             <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent p-4 pt-10">
                                 <div class="flex items-end justify-between gap-3">
-                                    <p class="{{ $isWide ? 'text-sm' : 'text-xs' }} font-medium leading-snug text-white drop-shadow">{{ $project['caption'] }}</p>
+                                    <p class="text-sm font-medium leading-snug text-white drop-shadow">{{ $project['caption'] }}</p>
                                     <span class="shrink-0 rounded-sm bg-[#b86033] px-2.5 py-1 text-[0.58rem] font-semibold uppercase tracking-[0.16em] text-white">{{ $project['tag'] }}</span>
                                 </div>
                             </div>
                         </article>
-                    @endforeach
-                </div>
-
-            </div>
-        </section>
-
-        {{-- ===== LIGHTBOX ===== --}}
-        <div
-            x-cloak
-            x-show="lightbox !== null"
-            x-transition:enter="transition ease-out duration-200"
-            x-transition:enter-start="opacity-0"
-            x-transition:enter-end="opacity-100"
-            x-transition:leave="transition ease-in duration-150"
-            x-transition:leave-start="opacity-100"
-            x-transition:leave-end="opacity-0"
-            class="fixed inset-0 z-[100] flex flex-col bg-black/95"
-            @click.self="close()"
-            role="dialog"
-            aria-modal="true"
-            aria-label="Photo viewer"
-        >
-            {{-- Top bar: counter + close --}}
-            <div class="flex shrink-0 items-center justify-between px-5 py-4">
-                <span class="text-xs font-medium text-white/40" x-text="lightbox ? lightbox.tag : ''"></span>
-                <button
-                    @click="close()"
-                    class="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20 focus:outline-none"
-                    aria-label="Close photo viewer"
-                >
-                    <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
-                    </svg>
-                </button>
-            </div>
-
-            {{-- Image — fills remaining space --}}
-            <div class="relative flex flex-1 items-center justify-center overflow-hidden px-14">
-
-                {{-- Prev --}}
-                <button
-                    @click.stop="step(-1)"
-                    class="absolute left-3 flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20 focus:outline-none"
-                    aria-label="Previous photo"
-                >
-                    <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/></svg>
-                </button>
-
-                <img
-                    :src="lightbox ? lightbox.image : ''"
-                    :alt="lightbox ? lightbox.caption : ''"
-                    class="max-h-full max-w-full object-contain"
-                >
-
-                {{-- Next --}}
-                <button
-                    @click.stop="step(1)"
-                    class="absolute right-3 flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20 focus:outline-none"
-                    aria-label="Next photo"
-                >
-                    <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
-                </button>
-
-            </div>
-
-            {{-- Caption bar --}}
-            <div class="shrink-0 border-t border-white/10 px-6 py-5">
-                <div class="mx-auto flex max-w-3xl items-center justify-between gap-6">
-                    <div>
-                        <p class="text-sm font-semibold text-white" x-text="lightbox ? lightbox.caption : ''"></p>
-                        <p class="mt-1 text-xs text-white/45" x-text="lightbox ? lightbox.product : ''"></p>
                     </div>
-                    <span
-                        class="shrink-0 rounded-sm bg-[#b86033] px-3 py-1.5 text-[0.62rem] font-semibold uppercase tracking-[0.18em] text-white"
-                        x-text="lightbox ? lightbox.tag : ''"
-                    ></span>
+
+                </div>
+            </section>
+
+            {{-- ===== LIGHTBOX ===== --}}
+            <div
+                x-cloak
+                x-show="lightbox !== null"
+                x-transition:enter="transition ease-out duration-200"
+                x-transition:enter-start="opacity-0"
+                x-transition:enter-end="opacity-100"
+                x-transition:leave="transition ease-in duration-150"
+                x-transition:leave-start="opacity-100"
+                x-transition:leave-end="opacity-0"
+                class="fixed inset-0 z-[100] flex flex-col bg-black/95"
+                @click.self="close()"
+                role="dialog"
+                aria-modal="true"
+                aria-label="Photo viewer"
+            >
+                {{-- Top bar: counter + close --}}
+                <div class="flex shrink-0 items-center justify-between px-5 py-4">
+                    <span class="text-xs font-medium text-white/40" x-text="lightbox ? lightbox.tag : ''"></span>
+                    <button
+                        @click="close()"
+                        class="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20 focus:outline-none"
+                        aria-label="Close photo viewer"
+                    >
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+
+                {{-- Image — fills remaining space --}}
+                <div class="relative flex flex-1 items-center justify-center overflow-hidden px-14">
+                    <img
+                        :src="lightbox ? lightbox.image : ''"
+                        :alt="lightbox ? lightbox.caption : ''"
+                        class="max-h-full max-w-full object-contain"
+                    >
+                </div>
+
+                {{-- Caption bar --}}
+                <div class="shrink-0 border-t border-white/10 px-6 py-5">
+                    <div class="mx-auto flex max-w-3xl items-center justify-between gap-6">
+                        <div>
+                            <p class="text-sm font-semibold text-white" x-text="lightbox ? lightbox.caption : ''"></p>
+                            <p class="mt-1 text-xs text-white/45" x-text="lightbox ? lightbox.product : ''"></p>
+                        </div>
+                        <span
+                            class="shrink-0 rounded-sm bg-[#b86033] px-3 py-1.5 text-[0.62rem] font-semibold uppercase tracking-[0.18em] text-white"
+                            x-text="lightbox ? lightbox.tag : ''"
+                        ></span>
+                    </div>
                 </div>
             </div>
 
-        </div>
-
-    </div>{{-- end x-data wrapper --}}
+        </div>{{-- end x-data wrapper --}}
+    @endif
 
     {{-- ===== CLOSING CTA ===== --}}
     <section class="bg-[#4a1e08] py-16">

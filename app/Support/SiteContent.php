@@ -611,7 +611,7 @@ class SiteContent
     {
         return [
             [
-                'image' => 'https://butendebrickworks.co.ug/wp-content/uploads/2024/11/1-2-830x467.jpg',
+                'image' => '/storage/site-content/projects/project-01.jpg',
                 'caption' => 'Brick walling on a residential homestead',
                 'tag' => 'Residential',
                 'product' => 'Bricks',
@@ -619,7 +619,7 @@ class SiteContent
                 'category' => 'Residential',
             ],
             [
-                'image' => 'https://butendebrickworks.co.ug/wp-content/uploads/2024/11/1-3-830x543.jpg',
+                'image' => '/storage/site-content/projects/project-02.jpg',
                 'caption' => 'Decorative brick feature at an entrance',
                 'tag' => 'Feature wall',
                 'product' => 'Decorative Bricks',
@@ -627,7 +627,7 @@ class SiteContent
                 'category' => 'Feature & Facade',
             ],
             [
-                'image' => 'https://butendebrickworks.co.ug/wp-content/uploads/2024/11/1-4-830x467.jpg',
+                'image' => '/storage/site-content/projects/project-03.jpg',
                 'caption' => 'Institutional building with exposed clay walling',
                 'tag' => 'Institutional',
                 'product' => 'Bricks',
@@ -635,7 +635,7 @@ class SiteContent
                 'category' => 'Institutional',
             ],
             [
-                'image' => 'https://butendebrickworks.co.ug/wp-content/uploads/2024/11/2-2-830x467.jpg',
+                'image' => '/storage/site-content/projects/project-04.jpg',
                 'caption' => 'Clay floor tiles laid in a covered outdoor space',
                 'tag' => 'Outdoor flooring',
                 'product' => 'Floor Tiles',
@@ -643,7 +643,7 @@ class SiteContent
                 'category' => 'Residential',
             ],
             [
-                'image' => 'https://butendebrickworks.co.ug/wp-content/uploads/2024/11/2-3-830x373.jpg',
+                'image' => '/storage/site-content/projects/project-05.jpg',
                 'caption' => 'Ventilators integrated into a boundary wall',
                 'tag' => 'Ventilation',
                 'product' => 'Ventilators',
@@ -651,7 +651,7 @@ class SiteContent
                 'category' => 'Feature & Facade',
             ],
             [
-                'image' => 'https://butendebrickworks.co.ug/wp-content/uploads/2025/02/DSC00628-830x467.jpg',
+                'image' => '/storage/site-content/projects/project-06.jpg',
                 'caption' => 'Completed structure built with Butende clay products',
                 'tag' => 'Completed project',
                 'product' => 'Bricks',
@@ -659,7 +659,7 @@ class SiteContent
                 'category' => 'Commercial',
             ],
             [
-                'image' => 'https://butendebrickworks.co.ug/wp-content/uploads/2025/02/DSC00558-830x467.jpg',
+                'image' => '/storage/site-content/projects/project-07.jpg',
                 'caption' => 'Plain brick walling detail on an active build',
                 'tag' => 'Walling detail',
                 'product' => 'Bricks',
@@ -667,7 +667,7 @@ class SiteContent
                 'category' => 'Residential',
             ],
             [
-                'image' => 'https://butendebrickworks.co.ug/wp-content/uploads/2025/02/DSC00569-830x467.jpg',
+                'image' => '/storage/site-content/projects/project-08.jpg',
                 'caption' => 'Grooved bricks giving rhythm to an external facade',
                 'tag' => 'Facade',
                 'product' => 'Decorative Bricks',
@@ -675,7 +675,7 @@ class SiteContent
                 'category' => 'Feature & Facade',
             ],
             [
-                'image' => 'https://butendebrickworks.co.ug/wp-content/uploads/2025/02/DSC00623-830x467.jpg',
+                'image' => '/storage/site-content/projects/project-09.jpg',
                 'caption' => 'Church construction project in the Masaka region',
                 'tag' => 'Church project',
                 'product' => 'Bricks',
