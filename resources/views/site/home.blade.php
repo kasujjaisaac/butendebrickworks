@@ -2,6 +2,22 @@
 
 @section('content')
 
+    {{-- Marquee placed above hero, below topbar --}}
+    <div class="bg-white">
+        <div class="page-grid py-3">
+            <div class="overflow-hidden rounded-sm bg-white">
+                <div class="animate-marquee flex min-w-full items-center gap-10 px-4 py-3">
+                    <span class="text-stone-900 font-normal text-sm sm:text-base whitespace-nowrap">
+                        "Welcome to Butende Brick Works! To place an order: Browse products, use our calculator to estimate quantities, then proceed to make your order. Create an account to place and track your orders easily."
+                    </span>
+                    <span class="text-stone-900 font-normal text-sm sm:text-base whitespace-nowrap">
+                        "Welcome to Butende Brick Works! To place an order: Browse products, use our calculator to estimate quantities, then proceed to make your order. Create an account to place and track your orders easily."
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
     {{-- ===== HERO + CALCULATOR ===== --}}
     <section id="hero" class="relative overflow-hidden bg-[#3d1505]">
 

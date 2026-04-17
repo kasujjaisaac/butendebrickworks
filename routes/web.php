@@ -118,6 +118,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::delete('/reviews/{review}', [ReviewsController::class, 'destroy'])->name('reviews.destroy');
     Route::patch('/reviews/{review}/approve', [ReviewsController::class, 'approve'])->name('reviews.approve');
     Route::patch('/reviews/{review}/featured', [ReviewsController::class, 'toggleFeatured'])->name('reviews.featured');
+
+    // Product Categories CRUD
+    Route::resource('categories', \App\Http\Controllers\Admin\ProductCategoriesController::class);
 });
 
 Route::get('/dashboard', function () {
