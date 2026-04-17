@@ -65,19 +65,9 @@
                                     :class="activeCategory === '{{ $category['slug'] }}'
                                         ? 'border-[#b86033] bg-[#fdf3ec] text-stone-950'
                                         : 'border-stone-200 bg-white text-stone-600 hover:border-stone-300 hover:bg-stone-50'"
-                                    class="mb-2 flex w-full flex-col items-center gap-2 border px-2 py-2 text-center transition lg:flex-row lg:items-center lg:justify-start lg:gap-3 lg:px-3 lg:py-2.5 lg:text-left"
+                                    class="mb-2 w-full rounded-sm border px-3 py-3 text-left text-sm font-semibold transition"
                                 >
-                                    <div class="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden border border-stone-200 bg-stone-50 lg:h-11 lg:w-11">
-                                        @if (! empty($category['image']))
-                                            <img src="{{ $category['image'] }}" alt="{{ $category['name'] }}" class="h-full w-full object-cover">
-                                        @else
-                                            <svg class="h-4 w-4 text-stone-300" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24" aria-hidden="true"><rect x="4.5" y="4.5" width="15" height="15" rx="1.5"/></svg>
-                                        @endif
-                                    </div>
-
-                                    <div class="min-w-0">
-                                        <p class="text-[0.68rem] font-semibold leading-4 text-inherit sm:text-[0.72rem] lg:text-xs">{{ $category['name'] }}</p>
-                                    </div>
+                                    {{ $category['name'] }}
                                 </button>
                             @endforeach
                         </div>

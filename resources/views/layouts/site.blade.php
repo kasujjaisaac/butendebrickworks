@@ -125,7 +125,6 @@
                                                 <div class="p-3">
                                                     @php
                                                         $navChildren = $item['children'];
-                                                        $catImageMap = collect($productCategories)->pluck('image', 'name')->all();
                                                     @endphp
 
                                                     {{-- All Products — full-width banner row --}}
@@ -136,7 +135,6 @@
                                                         </span>
                                                         <div class="flex-1 min-w-0">
                                                             <p class="text-sm font-semibold text-stone-900 transition group-hover/card:text-[#b86033]">{{ $navChildren[0]['label'] }}</p>
-                                                            <p class="text-xs text-stone-500">{{ $navChildren[0]['desc'] ?? '' }}</p>
                                                         </div>
                                                         <svg class="h-4 w-4 shrink-0 text-stone-300 transition group-hover/card:translate-x-0.5 group-hover/card:text-[#b86033]" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"/></svg>
                                                     </a>
@@ -144,32 +142,9 @@
                                                     {{-- Category cards: 4-column grid –– row 1: Bricks/Floor Tiles/Ventilators/Decorative Bricks, row 2: Other Products --}}
                                                     <div class="grid grid-cols-4 gap-1.5">
                                                         @foreach (array_slice($navChildren, 1) as $child)
-                                                            @php
-                                                                $icon     = $child['icon'] ?? 'square';
-                                                                $catImage = $catImageMap[$child['label']] ?? null;
-                                                            @endphp
                                                             <a href="{{ $child['path'] }}"
-                                                               class="group/card flex items-start gap-3 rounded-sm border border-stone-100 p-3.5 transition hover:border-[#b86033]/25 hover:bg-[#fdf3ec]">
-                                                                @if ($catImage)
-                                                                    <img src="{{ $catImage }}" alt="{{ $child['label'] }}"
-                                                                         class="mt-0.5 h-8 w-8 shrink-0 rounded-sm object-cover ring-1 ring-stone-200">
-                                                                @else
-                                                                <span class="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-sm border border-stone-200 bg-stone-50 text-stone-400 transition group-hover/card:border-[#b86033]/40 group-hover/card:bg-white group-hover/card:text-[#b86033]">
-                                                                    @if ($icon === 'square')
-                                                                        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="4.5" y="4.5" width="15" height="15" rx="1.5"/></svg>
-                                                                    @elseif ($icon === 'circle-dashed')
-                                                                        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 3.25A9 9 0 0 0 3.25 9.75M14.25 3.25A9 9 0 0 1 20.75 9.75M20.75 14.25A9 9 0 0 1 14.25 20.75M9.75 20.75A9 9 0 0 1 3.25 14.25"/></svg>
-                                                                    @elseif ($icon === 'sparkle')
-                                                                        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456Z"/></svg>
-                                                                    @else
-                                                                        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"/></svg>
-                                                                    @endif
-                                                                </span>
-                                                                @endif
-                                                                <div class="min-w-0">
-                                                                    <p class="text-sm font-semibold text-stone-900 transition group-hover/card:text-[#b86033]">{{ $child['label'] }}</p>
-                                                                    <p class="mt-0.5 text-xs leading-4 text-stone-500">{{ $child['desc'] ?? '' }}</p>
-                                                                </div>
+                                                               class="group/card block rounded-sm border border-stone-100 p-3.5 transition hover:border-[#b86033]/25 hover:bg-[#fdf3ec]">
+                                                                <p class="text-sm font-semibold text-stone-900 transition group-hover/card:text-[#b86033]">{{ $child['label'] }}</p>
                                                             </a>
                                                         @endforeach
                                                     </div>
