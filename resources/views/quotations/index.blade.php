@@ -35,7 +35,6 @@
                                 <th class="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">Product</th>
                                 <th class="hidden px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 sm:table-cell">Area</th>
                                 <th class="hidden px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 md:table-cell">Units</th>
-                                <th class="px-6 py-3.5 text-right text-xs font-semibold uppercase tracking-wide text-gray-500">Total</th>
                                 <th class="px-6 py-3.5 text-center text-xs font-semibold uppercase tracking-wide text-gray-500">Status</th>
                                 <th class="px-6 py-3.5 text-center text-xs font-semibold uppercase tracking-wide text-gray-500">Date</th>
                                 <th class="px-6 py-3.5"></th>
@@ -55,9 +54,6 @@
                                     </td>
                                     <td class="hidden px-6 py-4 text-gray-700 md:table-cell">
                                         {{ number_format($quotation->bricks_required) }}
-                                    </td>
-                                    <td class="px-6 py-4 text-right font-semibold text-gray-900">
-                                        UGX {{ number_format($quotation->total_price, 2) }}
                                     </td>
                                     <td class="px-6 py-4 text-center">
                                         @php

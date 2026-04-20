@@ -9,6 +9,8 @@ class OrderTracking extends Model
 {
     public $timestamps = false;
 
+    protected $table = 'order_tracking';
+
     protected $fillable = [
         'order_id',
         'status',

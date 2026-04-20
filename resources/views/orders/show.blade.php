@@ -62,12 +62,6 @@
                             <dt class="text-sm text-stone-500">Quantity</dt>
                             <dd class="text-sm font-semibold text-stone-900">{{ number_format($order->quantity) }} units</dd>
                         </div>
-                        @if ($product)
-                            <div class="flex items-center justify-between py-3">
-                                <dt class="text-sm text-stone-500">Price per Unit</dt>
-                                <dd class="text-sm font-semibold text-stone-900">UGX {{ number_format($product->price_per_brick, 2) }}</dd>
-                            </div>
-                        @endif
                         @if ($order->delivery_address)
                             <div class="flex items-start justify-between py-3">
                                 <dt class="text-sm text-stone-500">Delivery Address</dt>
@@ -89,10 +83,6 @@
                             <dt class="text-sm text-stone-500">Units Required</dt>
                             <dd class="text-sm font-semibold text-stone-900">{{ number_format($order->quotation->bricks_required) }}</dd>
                         </div>
-                        <div class="flex items-center justify-between py-3">
-                            <dt class="text-sm text-stone-500">Price per Unit</dt>
-                            <dd class="text-sm font-semibold text-stone-900">UGX {{ number_format($order->quotation->price_per_brick, 2) }}</dd>
-                        </div>
                     @endif
 
                     <div class="flex items-center justify-between py-3">
@@ -101,9 +91,11 @@
                     </div>
                 </dl>
 
-                <div class="mt-4 bg-stone-50 border border-stone-200 px-5 py-4 flex items-center justify-between rounded-sm">
-                    <span class="text-sm font-bold text-stone-900">Total Amount</span>
-                    <span class="text-xl font-extrabold text-[#6e2f0e]">UGX {{ number_format($order->total_amount, 2) }}</span>
+                <div class="mt-4 bg-[#f9ede6] border border-[#e8c9b4] px-5 py-4 flex items-center justify-between rounded-sm">
+                    <span class="text-sm font-bold text-[#6e2f0e]">Quantity Required</span>
+                    <span class="text-xl font-extrabold text-[#6e2f0e]">
+                        {{ $order->isDirectOrder() ? number_format($order->quantity) : number_format($order->quotation->bricks_required) }} units
+                    </span>
                 </div>
             </div>
 
@@ -139,7 +131,7 @@
                                     <div class="h-2 w-2 rounded-full bg-[#6e2f0e]"></div>
                                 </div>
                                 <div>
-                                    <p class="text-sm font-semibold text-stone-900">{{ Order::statusLabel($event->status) }}</p>
+                                    <p class="text-sm font-semibold text-stone-900">{{ \App\Models\Order::statusLabel($event->status) }}</p>
                                     @if ($event->message)
                                         <p class="text-sm text-stone-600">{{ $event->message }}</p>
                                     @endif

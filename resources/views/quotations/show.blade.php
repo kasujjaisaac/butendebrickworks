@@ -56,23 +56,11 @@
                             <dt class="text-sm text-stone-500">Units Required</dt>
                             <dd class="text-sm font-bold text-[#6e2f0e]">{{ number_format($quotation->bricks_required) }} units</dd>
                         </div>
-                        <div class="flex items-center justify-between py-3">
-                            <dt class="text-sm text-stone-500">Price per Unit</dt>
-                            <dd class="text-sm font-semibold text-gray-900">UGX {{ number_format($quotation->price_per_brick, 2) }}</dd>
-                        </div>
                     </dl>
-
-                    <div class="mt-4 bg-stone-50 border border-stone-200 px-5 py-4 flex items-center justify-between rounded-sm">
-                        <span class="text-sm font-bold text-stone-900">Total Cost</span>
-                        <span class="text-xl font-extrabold text-[#6e2f0e]">
-                            UGX {{ number_format($quotation->total_price, 2) }}
-                        </span>
-                    </div>
 
                     <p class="mt-3 text-xs text-stone-400">
                         * {{ number_format($quotation->square_metres, 2) }} m² &times;
-                        {{ $quotation->product->bricks_per_square_metre }} units/m² &times;
-                        UGX {{ number_format($quotation->price_per_brick, 2) }}/unit
+                        {{ $quotation->product->bricks_per_square_metre }} units/m²
                     </p>
                 </div>
 
@@ -85,6 +73,7 @@
                             <input type="hidden" name="quotation_id" value="{{ $quotation->id }}">
                             <button
                                 type="submit"
+                                onclick="return confirm('Are you sure you want to place this order for {{ number_format($quotation->bricks_required) }} {{ $quotation->product->name }}?')"
                                 class="w-full bg-[#6e2f0e] px-6 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-[#5a2509] focus:outline-none focus:ring-2 focus:ring-[#6e2f0e] focus:ring-offset-2 rounded-sm"
                             >
                                 Confirm Order &rarr;

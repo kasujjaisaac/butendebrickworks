@@ -4,12 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class BrickProduct extends Model
 {
     protected $fillable = [
         'name',
         'category',
+        'category_id',
         'description',
         'image',
         'weight_kg',
@@ -29,6 +31,28 @@ class BrickProduct extends Model
             'coverage_sqm'            => 'decimal:6',
             'is_active'               => 'boolean',
         ];
+    }
+
+    /**
+     * Relationship to ProductCategory
+     */
+    public function categoryModel(): BelongsTo
+    {
+        return $this->belongsTo(ProductCategory::class, 'category_id');
+    }
+
+    /**
+     * Get the category name (for backward compatibility with old 'category' column)
+     */
+    public function getCategoryAttribute(): ?string
+    {
+        // If category relationship exists, use it
+        if ($this->relationLoaded('categoryModel') && $this->categoryModel) {
+            return $this->categoryModel->name;
+        }
+        
+        // Fall back to the relationship name if not loaded
+        return $this->categoryModel?->name;
     }
 
     /**

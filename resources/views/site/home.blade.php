@@ -64,67 +64,49 @@
                 @endphp
 
                 <div x-data="heroCalc({{ $calcProducts->map(fn($p) => [
-                    'id'         => $p->id,
-                    'name'       => $p->name,
-                    'category'   => $p->category,
-                    'coverage'   => (float) ($p->coverage_sqm ?? 0),
-                    'weight_kg'  => (float) ($p->weight_kg ?? 0),
-                    'price'      => (float) $p->price_per_brick,
+                    'id'           => $p->id,
+                    'name'         => $p->name,
+                    'category'     => $p->category,
+                    'categoryKey'  => \Illuminate\Support\Str::slug($p->category ?: 'other'),
+                    'coverage'     => (float) ($p->coverage_sqm ?? 0),
+                    'bpsm'         => (int) ($p->bricks_per_square_metre ?? 0),
                 ]) ->values()->toJson() }})"
-                     class="relative overflow-hidden rounded-sm border border-white/15 bg-white/10 shadow-2xl backdrop-blur-md">
+                     x-init="init()"
+                     @keydown.escape.window="closeEstimateModal()"
+                     class="relative">
 
-                    {{-- Amber top accent --}}
-                    <div class="h-0.5 w-full bg-gradient-to-r from-[#e8a06a] via-[#b86033] to-transparent"></div>
+                    <div class="relative overflow-hidden rounded-sm border border-white/15 bg-white/10 shadow-2xl backdrop-blur-md">
 
-                    {{-- Header --}}
-                    <div class="flex items-center gap-3 border-b border-white/10 bg-black/15 px-6 py-4">
-                        <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-sm bg-[#e8a06a]/20 border border-[#e8a06a]/20">
-                            <svg class="h-4 w-4 text-[#e8a06a]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 15.75V18m-7.5-6.75h.008v.008H8.25v-.008Zm0 2.25h.008v.008H8.25V13.5Zm0 2.25h.008v.008H8.25v-.008Zm0 2.25h.008v.008H8.25V18Zm2.498-6.75h.007v.008h-.007v-.008Zm0 2.25h.007v.008h-.007V13.5Zm0 2.25h.007v.008h-.007v-.008Zm0 2.25h.007v.008h-.007V18Zm2.504-6.75h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V13.5Zm0 2.25h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V18Zm2.498-6.75h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V13.5ZM8.25 6h7.5v2.25h-7.5V6ZM12 2.25c-1.892 0-3.758.11-5.593.322C5.307 2.7 4.5 3.616 4.5 4.698V18a2.25 2.25 0 0 0 2.25 2.25h10.5A2.25 2.25 0 0 0 19.5 18V4.698c0-1.082-.807-1.998-1.907-2.126A48.32 48.32 0 0 0 12 2.25Z"/>
-                            </svg>
-                        </div>
-                        <div>
-                            <p class="text-sm font-semibold text-white">Brick &amp; Product Estimator</p>
-                            <p class="text-[11px] text-white/45">Instant quantity &amp; weight estimate</p>
-                        </div>
-                    </div>
+                        {{-- Amber top accent --}}
+                        <div class="h-0.5 w-full bg-gradient-to-r from-[#e8a06a] via-[#b86033] to-transparent"></div>
 
-                    <div class="px-6 py-5 space-y-4">
-
-                        {{-- Row 1: Category (full width) --}}
-                        <div>
-                            <label class="mb-1.5 block text-[10px] font-semibold uppercase tracking-[0.18em] text-white/55">Product Category</label>
-                            <div class="relative">
-                                <select x-model="category" @change="selectedProductId = ''; selectedProduct = null; result = null"
-                                        class="w-full appearance-none rounded-sm border border-white/20 bg-white/10 px-4 py-2.5 text-sm text-white outline-none transition focus:border-[#e8a06a] focus:ring-1 focus:ring-[#e8a06a]/30">
-                                    <option value="" style="background:#3d1505">— Choose a category —</option>
-                                    @foreach ($availableCategories as $cat)
-                                        @if ($groupedProducts->get($cat, collect())->isNotEmpty())
-                                            <option value="{{ trim($cat) }}" style="background:#3d1505">{{ $cat }}</option>
-                                        @endif
-                                    @endforeach
-                                </select>
-                                <div class="pointer-events-none absolute inset-y-0 right-3 flex items-center">
-                                    <svg class="h-4 w-4 text-white/40" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
-                                </div>
+                        {{-- Header --}}
+                        <div class="flex items-center gap-3 border-b border-white/10 bg-black/15 px-6 py-4">
+                            <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-sm bg-[#e8a06a]/20 border border-[#e8a06a]/20">
+                                <svg class="h-4 w-4 text-[#e8a06a]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 15.75V18m-7.5-6.75h.008v.008H8.25v-.008Zm0 2.25h.008v.008H8.25V13.5Zm0 2.25h.008v.008H8.25v-.008Zm0 2.25h.008v.008H8.25V18Zm2.498-6.75h.007v.008h-.007v-.008Zm0 2.25h.007v.008h-.007V13.5Zm0 2.25h.007v.008h-.007v-.008Zm0 2.25h.007v.008h-.007V18Zm2.504-6.75h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V13.5Zm0 2.25h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V18Zm2.498-6.75h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V13.5ZM8.25 6h7.5v2.25h-7.5V6ZM12 2.25c-1.892 0-3.758.11-5.593.322C5.307 2.7 4.5 3.616 4.5 4.698V18a2.25 2.25 0 0 0 2.25 2.25h10.5A2.25 2.25 0 0 0 19.5 18V4.698c0-1.082-.807-1.998-1.907-2.126A48.32 48.32 0 0 0 12 2.25Z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-sm font-semibold text-white">Brick &amp; Product Estimator</p>
+                                <p class="text-[11px] text-white/45">Instant quantity estimate</p>
                             </div>
                         </div>
 
-                        {{-- Row 2: Product + Area on same line --}}
-                        <div class="grid grid-cols-2 gap-3">
+                        <div class="px-6 py-5 space-y-4">
 
-                            {{-- Product --}}
+                            {{-- Row 1: Category (full width) --}}
                             <div>
-                                <label class="mb-1.5 block text-[10px] font-semibold uppercase tracking-[0.18em] transition-colors duration-200"
-                                       :class="category ? 'text-white/55' : 'text-white/25'">Product</label>
+                                <label class="mb-1.5 block text-[10px] font-semibold uppercase tracking-[0.18em] text-white/55">Product Category</label>
                                 <div class="relative">
-                                    <select x-model.number="selectedProductId" @change="setProductById()" :disabled="!category"
-                                            class="w-full appearance-none rounded-sm border border-white/20 bg-white/10 px-4 py-2.5 text-sm text-white outline-none transition focus:border-[#e8a06a] focus:ring-1 focus:ring-[#e8a06a]/30"
-                                            :class="category ? 'opacity-100 cursor-pointer' : 'opacity-50 cursor-not-allowed'">
-                                        <option value="" style="background:#3d1505">— Select a product —</option>
-                                        <template x-for="prod in filteredProducts" :key="prod.id">
-                                            <option :value="prod.id" x-text="prod.name" style="background:#3d1505"></option>
-                                        </template>
+                                    <select x-model="categoryKey" @change="handleCategoryChange($event.target.value)"
+                                            class="w-full appearance-none rounded-sm border border-white/20 bg-white/10 px-4 py-2.5 text-sm text-white outline-none transition focus:border-[#e8a06a] focus:ring-1 focus:ring-[#e8a06a]/30">
+                                        <option value="" style="background:#3d1505">— Choose a category —</option>
+                                        @foreach ($availableCategories as $cat)
+                                            @if ($groupedProducts->get($cat, collect())->isNotEmpty())
+                                                <option value="{{ \Illuminate\Support\Str::slug(trim($cat)) }}" style="background:#3d1505">{{ $cat }}</option>
+                                            @endif
+                                        @endforeach
                                     </select>
                                     <div class="pointer-events-none absolute inset-y-0 right-3 flex items-center">
                                         <svg class="h-4 w-4 text-white/40" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
@@ -132,88 +114,130 @@
                                 </div>
                             </div>
 
-                            {{-- Area --}}
-                            <div>
-                                <label class="mb-1.5 block text-[10px] font-semibold uppercase tracking-[0.18em] transition-colors duration-200"
-                                       :class="selectedProduct ? 'text-white/55' : 'text-white/25'">Area (m²)</label>
-                                <div class="relative">
-                                    <input type="number" min="0.1" step="0.1" placeholder="e.g. 50"
-                                           x-model.number="sqm"
-                                           :disabled="!selectedProduct"
-                                           @keydown.enter="calculate()"
-                                           class="w-full rounded-sm border border-white/20 bg-white/10 px-4 py-2.5 pr-10 text-sm text-white placeholder-white/35 outline-none transition focus:border-[#e8a06a] focus:ring-1 focus:ring-[#e8a06a]/30"
-                                           :class="selectedProduct ? 'opacity-100 cursor-text' : 'opacity-50 cursor-not-allowed'">
-                                    <span class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[11px] font-bold transition-colors duration-200"
-                                          :class="selectedProduct ? 'text-[#e8a06a]/50' : 'text-white/20'">m²</span>
+                            {{-- Row 2: Product + Area on same line --}}
+                            <div class="grid grid-cols-2 gap-3">
+
+                                {{-- Product --}}
+                                <div>
+                                    <label class="mb-1.5 block text-[10px] font-semibold uppercase tracking-[0.18em] transition-colors duration-200"
+                                           :class="categoryKey ? 'text-white/55' : 'text-white/25'">Product</label>
+                                    <div class="relative">
+                                        <select x-ref="productSelect" x-model="selectedProductId" @change="setProductById($event.target.value)" :disabled="!categoryKey"
+                                                class="w-full appearance-none rounded-sm border border-white/20 bg-white/10 px-4 py-2.5 text-sm text-white outline-none transition focus:border-[#e8a06a] focus:ring-1 focus:ring-[#e8a06a]/30"
+                                                :class="categoryKey ? 'opacity-100 cursor-pointer' : 'opacity-50 cursor-not-allowed'">
+                                            <option value="" style="background:#3d1505">— Choose a category first —</option>
+                                        </select>
+                                        <div class="pointer-events-none absolute inset-y-0 right-3 flex items-center">
+                                            <svg class="h-4 w-4 text-white/40" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {{-- Area --}}
+                                <div>
+                                    <label class="mb-1.5 block text-[10px] font-semibold uppercase tracking-[0.18em] transition-colors duration-200"
+                                           :class="selectedProduct ? 'text-white/55' : 'text-white/25'">Area (m²)</label>
+                                    <div class="relative">
+                                        <input type="number" min="0.1" step="0.1" placeholder="e.g. 50"
+                                               x-model.number="sqm"
+                                               :disabled="!selectedProduct"
+                                               @keydown.enter="calculate()"
+                                               class="w-full rounded-sm border border-white/20 bg-white/10 px-4 py-2.5 pr-10 text-sm text-white placeholder-white/35 outline-none transition focus:border-[#e8a06a] focus:ring-1 focus:ring-[#e8a06a]/30"
+                                               :class="selectedProduct ? 'opacity-100 cursor-text' : 'opacity-50 cursor-not-allowed'">
+                                        <span class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[11px] font-bold transition-colors duration-200"
+                                              :class="selectedProduct ? 'text-[#e8a06a]/50' : 'text-white/20'">m²</span>
+                                    </div>
                                 </div>
                             </div>
+
+                            {{-- Calculate button --}}
+                            <button type="button" @click="calculate()" :disabled="!selectedProduct || !sqm"
+                                    class="w-full rounded-sm px-6 py-2 text-sm font-bold tracking-wide transition-all duration-200 focus:outline-none"
+                                    :class="selectedProduct && sqm
+                                        ? 'bg-[#e8a06a] text-[#3d1505] hover:bg-[#d4904f] hover:-translate-y-px shadow-md hover:shadow-[0_4px_16px_rgba(232,160,106,0.35)] active:translate-y-0'
+                                        : 'bg-[#e8a06a]/20 text-white/50 cursor-not-allowed'">
+                                <span class="flex items-center justify-center gap-2">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.59 14.37a6 6 0 0 1-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 0 0 6.16-12.12A14.98 14.98 0 0 0 9.631 8.41m5.96 5.96a14.926 14.926 0 0 1-5.841 2.58m-.119-8.54a6 6 0 0 0-7.381 5.84h4.8m2.581-5.84a14.927 14.927 0 0 0-2.58 5.84m2.699 2.7c-.103.021-.207.041-.311.06a15.09 15.09 0 0 1-2.448-2.448 14.9 14.9 0 0 1 .06-.312m-2.24 2.39a4.493 4.493 0 0 0-1.757 4.306 4.493 4.493 0 0 0 4.306-1.758M16.5 9a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z"/></svg>
+                                    Calculate Estimate
+                                </span>
+                            </button>
+
                         </div>
 
-                        {{-- Calculate button --}}
-                        <button type="button" @click="calculate()" :disabled="!selectedProduct || !sqm"
-                                class="w-full rounded-sm px-6 py-2 text-sm font-bold tracking-wide transition-all duration-200 focus:outline-none"
-                                :class="selectedProduct && sqm
-                                    ? 'bg-[#e8a06a] text-[#3d1505] hover:bg-[#d4904f] hover:-translate-y-px shadow-md hover:shadow-[0_4px_16px_rgba(232,160,106,0.35)] active:translate-y-0'
-                                    : 'bg-[#e8a06a]/20 text-white/50 cursor-not-allowed'">
-                            <span class="flex items-center justify-center gap-2">
-                                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.59 14.37a6 6 0 0 1-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 0 0 6.16-12.12A14.98 14.98 0 0 0 9.631 8.41m5.96 5.96a14.926 14.926 0 0 1-5.841 2.58m-.119-8.54a6 6 0 0 0-7.381 5.84h4.8m2.581-5.84a14.927 14.927 0 0 0-2.58 5.84m2.699 2.7c-.103.021-.207.041-.311.06a15.09 15.09 0 0 1-2.448-2.448 14.9 14.9 0 0 1 .06-.312m-2.24 2.39a4.493 4.493 0 0 0-1.757 4.306 4.493 4.493 0 0 0 4.306-1.758M16.5 9a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z"/></svg>
-                                Calculate Estimate
-                            </span>
-                        </button>
+                        <div class="border-t border-white/8 px-6 pb-4 pt-3">
+                        </div>
 
-                        {{-- Result panel --}}
-                        <div x-show="result !== null"
-                             x-transition:enter="transition ease-out duration-300"
-                             x-transition:enter-start="opacity-0 translate-y-2"
-                             x-transition:enter-end="opacity-100 translate-y-0">
-                            <div class="rounded-sm border border-[#e8a06a]/35 bg-[#e8a06a]/10 p-4">
-                                <div class="flex items-center gap-2 mb-3">
-                                    <svg class="h-3.5 w-3.5 text-[#e8a06a]" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
-                                    <p class="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#e8a06a]">Your Estimate</p>
+                    </div>
+                    {{-- /calculator --}}
+
+                    <template x-teleport="body">
+                        <div
+                            x-cloak
+                            x-show="showEstimateModal"
+                            x-transition:enter="transition ease-out duration-250"
+                            x-transition:enter-start="opacity-0"
+                            x-transition:enter-end="opacity-100"
+                            x-transition:leave="transition ease-in duration-200"
+                            x-transition:leave-start="opacity-100"
+                            x-transition:leave-end="opacity-0"
+                            class="fixed inset-0 z-[120] flex items-center justify-center bg-black/65 p-4"
+                            @click.self="closeEstimateModal()"
+                        >
+                            <div class="w-full max-w-md rounded-sm bg-white shadow-2xl">
+                                <div class="flex items-start justify-between gap-4 border-b border-stone-200 px-5 py-4">
+                                    <div>
+                                        <p class="text-[0.65rem] font-semibold uppercase tracking-[0.22em] text-[#b86033]">Calculation Result</p>
+                                        <h3 class="mt-1 text-lg font-semibold text-stone-900">Products needed</h3>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        @click="closeEstimateModal()"
+                                        class="flex h-9 w-9 items-center justify-center rounded-full bg-stone-100 text-stone-500 transition hover:bg-stone-200 hover:text-stone-900"
+                                        aria-label="Close estimator result"
+                                    >
+                                        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
+                                        </svg>
+                                    </button>
                                 </div>
-                                {{-- Summary sentence --}}
-                                <p class="text-sm leading-relaxed text-white mb-2">
-                                    For
-                                    <span class="font-bold text-[#e8a06a]" x-text="sqm + ' m²'"></span>,
-                                    you will need
-                                    <span class="font-bold text-white" x-text="result ? result.units.toLocaleString() : '—'"></span>
-                                    <span x-text="selectedProduct ? selectedProduct.name : ''"></span>
-                                    <template x-if="result && result.weightLabel !== '—'">
-                                        <span>
-                                            — with a total weight of
-                                            <span class="font-bold text-[#e8a06a]" x-text="result.weightLabel"></span>.
-                                        </span>
-                                    </template>
-                                </p>
-                                <p class="text-[10px] text-white/35 mb-3">* Estimate only. Actual quantities may vary with mortar joints and waste.</p>
-                                @auth
-                                    <a :href="'/quotation/create?product_id=' + (selectedProduct ? selectedProduct.id : '') + '&sqm=' + sqm"
-                                       class="flex w-full items-center justify-center gap-2 rounded-sm bg-[#e8a06a] py-2.5 text-sm font-bold text-[#3d1505] transition hover:bg-[#d4904f] focus:outline-none">
-                                        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg>
-                                        Save as Formal Quotation
-                                    </a>
-                                @else
-                                    <div class="grid grid-cols-2 gap-2">
-                                        <a href="{{ route('register') }}"
-                                           class="flex items-center justify-center rounded-sm bg-[#e8a06a] py-2.5 text-xs font-bold text-[#3d1505] transition hover:bg-[#d4904f]">
-                                            Create account
+
+                                <div class="space-y-4 px-5 py-5">
+                                    <p class="text-sm leading-7 text-stone-700" x-text="customerMessage()"></p>
+
+                                    <div class="grid gap-3 sm:grid-cols-2">
+                                        <div class="rounded-sm border border-stone-200 bg-stone-50 px-4 py-3">
+                                            <p class="text-[0.62rem] font-semibold uppercase tracking-[0.18em] text-stone-400">Product</p>
+                                            <p class="mt-1 text-sm font-semibold text-stone-900" x-text="selectedProduct ? selectedProduct.name : ''"></p>
+                                        </div>
+                                        <div class="rounded-sm border border-stone-200 bg-stone-50 px-4 py-3">
+                                            <p class="text-[0.62rem] font-semibold uppercase tracking-[0.18em] text-stone-400">Construction Area</p>
+                                            <p class="mt-1 text-sm font-semibold text-stone-900" x-text="formattedArea()"></p>
+                                        </div>
+                                    </div>
+
+                                    <div class="rounded-sm border border-[#e8a06a]/35 bg-[#fff6ef] px-4 py-4 text-center">
+                                        <p class="text-[0.62rem] font-semibold uppercase tracking-[0.18em] text-[#b86033]">Estimated Quantity</p>
+                                        <p class="mt-2 text-3xl font-bold text-[#6e2f0e]" x-text="formattedUnits()"></p>
+                                    </div>
+
+                                    <div class="grid gap-3 sm:grid-cols-2">
+                                        <a
+                                            :href="quoteUrl()"
+                                            class="inline-flex items-center justify-center rounded-sm border border-[#b86033] bg-white px-4 py-3 text-sm font-semibold text-[#b86033] transition hover:bg-[#fff5ee]"
+                                        >
+                                            Ask Quotation
                                         </a>
-                                        <a href="{{ route('login') }}"
-                                           class="flex items-center justify-center rounded-sm border border-white/20 bg-white/5 py-2.5 text-xs font-semibold text-white transition hover:bg-white/10">
-                                            Sign in
+                                        <a
+                                            :href="orderUrl()"
+                                            class="inline-flex items-center justify-center rounded-sm bg-[#6e2f0e] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#55200a]"
+                                        >
+                                            Make Order Now
                                         </a>
                                     </div>
-                                @endauth
+                                </div>
                             </div>
                         </div>
-
-                    </div>
-
-                    <div class="border-t border-white/8 px-6 pb-4 pt-3">
-                    </div>
-
-                </div>
-                {{-- /calculator --}}
+                    </template>
 
             </div>
         </div>
@@ -222,47 +246,150 @@
 @push('scripts')
 <script>
 function heroCalc(products) {
+    const formatter = new Intl.NumberFormat('en-UG');
+    const orderBase = @js(route('orders.index'));
+    const quoteBase = @js(route('quotation.create'));
+
     return {
         products,
-        category: '',
+        categoryKey: '',
+        productOptions: [],
         selectedProductId: '',
         selectedProduct: null,
         sqm: '',
+        greeting: '',
         result: null,
 
-        get filteredProducts() {
-            if (!this.category) return [];
-            const selectedCat = (this.category || '').toString().trim().toLowerCase();
-            return this.products.filter(p => (p.category || '').toString().trim().toLowerCase() === selectedCat);
+        init() {
+            this.renderProductOptions();
         },
 
-        setProductById() {
-            this.selectedProduct = this.products.find(p => p.id === parseInt(this.selectedProductId)) || null;
+        getSelectedProduct() {
+            return this.productOptions.find(product => String(product.id) === String(this.selectedProductId)) || null;
+        },
+
+        renderProductOptions() {
+            const select = this.$refs.productSelect;
+
+            if (!select) {
+                return;
+            }
+
+            this.productOptions = this.products.filter(product => product.categoryKey === this.categoryKey);
+            select.innerHTML = '';
+
+            const placeholder = document.createElement('option');
+            placeholder.value = '';
+            placeholder.style.background = '#3d1505';
+
+            if (!this.categoryKey) {
+                placeholder.textContent = '— Choose a category first —';
+                select.appendChild(placeholder);
+                return;
+            }
+
+            if (this.productOptions.length === 0) {
+                placeholder.textContent = '— No products found —';
+                select.appendChild(placeholder);
+                return;
+            }
+
+            placeholder.textContent = '— Select a product —';
+            select.appendChild(placeholder);
+
+            this.productOptions.forEach(product => {
+                const option = document.createElement('option');
+                option.value = String(product.id);
+                option.textContent = product.name;
+                option.style.background = '#3d1505';
+                select.appendChild(option);
+            });
+        },
+
+        handleCategoryChange(value = this.categoryKey) {
+            this.categoryKey = String(value || '');
+            this.selectedProductId = '';
+            this.selectedProduct = null;
+            this.result = null;
+            this.renderProductOptions();
+        },
+
+        setProductById(value = this.selectedProductId) {
+            this.selectedProductId = String(value || '');
+            this.selectedProduct = this.getSelectedProduct();
             this.result = null;
         },
 
+        closeEstimateModal() {
+            this.result = null;
+            document.body.classList.remove('overflow-hidden');
+        },
+
+        getGreeting() {
+            const hour = new Date().getHours();
+
+            if (hour < 12) return 'Good morning customer.';
+            if (hour < 18) return 'Good afternoon customer.';
+            return 'Good evening customer.';
+        },
+
+        formattedUnits() {
+            return this.result ? formatter.format(this.result.units) : '—';
+        },
+
+        formattedArea() {
+            return this.sqm ? formatter.format(this.sqm) + ' m²' : '—';
+        },
+
+        customerMessage() {
+            if (!this.result || !this.selectedProduct) return '';
+
+            return 'Dear customer, as per your desired construction area of ' + this.formattedArea() + ', you will need ' + formatter.format(this.result.units) + ' ' + this.selectedProduct.name + '.';
+        },
+
+        orderUrl() {
+            if (!this.selectedProduct || !this.result) return orderBase;
+
+            const params = new URLSearchParams({
+                product_id: this.selectedProduct.id,
+                quantity: this.result.units,
+            });
+
+            return orderBase + '?' + params.toString();
+        },
+
+        quoteUrl() {
+            if (!this.selectedProduct || !this.sqm) return quoteBase;
+
+            const params = new URLSearchParams({
+                product_id: this.selectedProduct.id,
+                sqm: this.sqm,
+            });
+
+            return quoteBase + '?' + params.toString();
+        },
+
+        get showEstimateModal() {
+            return this.result !== null;
+        },
+
         calculate() {
+            this.selectedProduct = this.getSelectedProduct();
+
             if (!this.selectedProduct || !this.sqm || this.sqm <= 0) {
                 this.result = null;
+                document.body.classList.remove('overflow-hidden');
                 return;
             }
+
             const coverage = this.selectedProduct.coverage;
             const units = coverage > 0
                 ? Math.ceil(this.sqm / coverage)
-                : Math.ceil(this.sqm * 60);
+                : Math.ceil(this.sqm * (this.selectedProduct.bpsm || 60));
 
-            const totalWeightKg = this.selectedProduct.weight_kg > 0
-                ? units * this.selectedProduct.weight_kg
-                : null;
-
-            let weightLabel = '—';
-            if (totalWeightKg !== null) {
-                weightLabel = totalWeightKg >= 1000
-                    ? (totalWeightKg / 1000).toFixed(2) + ' t'
-                    : Math.round(totalWeightKg) + ' kg';
-            }
-
-            this.result = { units, weightLabel };
+            this.greeting = this.getGreeting();
+            this.result = { units };
+            document.body.classList.add('overflow-hidden');
         }
     };
 }

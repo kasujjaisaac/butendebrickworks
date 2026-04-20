@@ -20,9 +20,9 @@ class SiteController extends Controller
     {
         // DB products for the hero calculator — grouped by category, only active
         $calcProducts = BrickProduct::active()
-            ->orderBy('category')
+            ->orderBy('category_id')
             ->orderBy('name')
-            ->get(['id', 'name', 'category', 'coverage_sqm', 'bricks_per_square_metre', 'weight_kg', 'price_per_brick']);
+            ->get(['id', 'name', 'category_id', 'coverage_sqm', 'bricks_per_square_metre', 'weight_kg', 'price_per_brick']);
 
         $calcCategories = AdminProductsController::CATEGORIES;
 
@@ -165,12 +165,21 @@ class SiteController extends Controller
 
     public function calculator()
     {
-        $products = BrickProduct::active()->orderBy('category')->orderBy('name')->get();
+        $products = BrickProduct::active()->with('categoryModel')->orderBy('category_id')->orderBy('name')->get();
+        
+        $productsJson = $products->map(fn ($product) => [
+            'id' => $product->id,
+            'name' => $product->name,
+            'category' => $product->category ?? 'Other',
+            'coverage' => (float) $product->coverage,
+            'bricks_per_square_metre' => (int) $product->bricks_per_square_metre,
+        ])->values();
 
         return view('site.calculator', $this->sharedData([
             'title' => 'Products Calculator | Butende Brick Works',
             'metaDescription' => 'Use our free products calculator to estimate how many bricks or tiles you need for your project and get an instant cost estimate.',
             'products' => $products,
+            'productsJson' => $productsJson,
         ]));
     }
 
@@ -347,10 +356,11 @@ class SiteController extends Controller
     private function productCategories(): array
     {
         return BrickProduct::active()
-            ->orderBy('category')
+            ->with('categoryModel')
+            ->orderBy('category_id')
             ->orderBy('name')
-            ->get(['id', 'name', 'category', 'description', 'image'])
-            ->groupBy('category')
+            ->get(['id', 'name', 'category_id', 'description', 'image'])
+            ->groupBy(fn($product) => $product->category ?? 'Other')
             ->map(function ($items, $category) {
                 return $this->categoryMetaFor($category, $items);
             })

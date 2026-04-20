@@ -23,7 +23,14 @@
         @endif
 
         {{-- ── Place a Direct Order ──────────────────────────────────── --}}
-        <div x-data="orderForm()" class="border border-stone-200 bg-white shadow-sm overflow-hidden rounded-md">
+        <div
+            x-data="orderForm({
+                initialProductId: '{{ old('brick_product_id', request('product_id', '')) }}',
+                initialQuantity: '{{ old('quantity', request('quantity', '')) }}'
+            })"
+            x-init="init()"
+            class="border border-stone-200 bg-white shadow-sm overflow-hidden rounded-md"
+        >
 
             {{-- Section header --}}
             <div class="flex items-center gap-3 bg-[#6e2f0e] px-6 py-4">
@@ -68,10 +75,9 @@
                             @foreach ($products as $p)
                                 <option
                                     value="{{ $p->id }}"
-                                    data-price="{{ $p->price_per_brick }}"
                                     data-name="{{ $p->name }}"
-                                    {{ old('brick_product_id') == $p->id ? 'selected' : '' }}
-                                >{{ $p->name }} — UGX {{ number_format($p->price_per_brick, 2) }} / unit</option>
+                                    {{ old('brick_product_id', request('product_id')) == $p->id ? 'selected' : '' }}
+                                >{{ $p->name }}</option>
                             @endforeach
                         </select>
                         @error('brick_product_id')
@@ -88,7 +94,7 @@
                             type="number"
                             id="quantity"
                             name="quantity"
-                            value="{{ old('quantity') }}"
+                            value="{{ old('quantity', request('quantity')) }}"
                             min="1"
                             placeholder="e.g. 5000"
                             @input="updateTotal()"
@@ -101,11 +107,7 @@
 
                 </div>
 
-                {{-- Estimated total --}}
-                <div x-show="total > 0" x-cloak class="flex items-center justify-between border border-amber-200 bg-amber-50 px-4 py-3 rounded-sm">
-                    <span class="text-xs font-semibold uppercase tracking-wide text-amber-700">Estimated Total</span>
-                    <span class="text-lg font-extrabold text-amber-900">UGX <span x-text="total.toLocaleString('en-UG', {minimumFractionDigits:2})"></span></span>
-                </div>
+
 
                 {{-- Delivery address --}}
                 <div>
@@ -170,7 +172,6 @@
                                 <th class="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-stone-500">Order #</th>
                                 <th class="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-stone-500">Product</th>
                                 <th class="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-stone-500">Qty / Area</th>
-                                <th class="px-5 py-3 text-right text-[11px] font-semibold uppercase tracking-wide text-stone-500">Total</th>
                                 <th class="px-5 py-3 text-center text-[11px] font-semibold uppercase tracking-wide text-stone-500">Type</th>
                                 <th class="px-5 py-3 text-center text-[11px] font-semibold uppercase tracking-wide text-stone-500">Status</th>
                                 <th class="px-5 py-3 text-center text-[11px] font-semibold uppercase tracking-wide text-stone-500">Date</th>
@@ -203,9 +204,6 @@
                                         @else
                                             {{ number_format($order->quotation->square_metres, 1) }} m²
                                         @endif
-                                    </td>
-                                    <td class="px-5 py-3.5 text-right text-[13px] font-semibold text-stone-900">
-                                        UGX {{ number_format($order->total_amount, 2) }}
                                     </td>
                                     <td class="px-5 py-3.5 text-center">
                                         <span class="inline-flex rounded-sm px-2 py-0.5 text-[10px] font-semibold {{ $order->isDirectOrder() ? 'bg-stone-100 text-stone-600' : 'bg-[#f9ede6] text-[#6e2f0e]' }}">
@@ -241,20 +239,27 @@
 
     @push('scripts')
     <script>
-        function orderForm() {
+        function orderForm(config) {
             return {
-                pricePerUnit: 0,
-                quantity: 0,
-                total: 0,
+                initialProductId: config.initialProductId || '',
+                initialQuantity: config.initialQuantity || '',
+                init() {
+                    const select = document.getElementById('brick_product_id');
+                    const quantityInput = document.getElementById('quantity');
+
+                    if (this.initialProductId && select) {
+                        select.value = this.initialProductId;
+                    }
+
+                    if (this.initialQuantity && quantityInput && !quantityInput.value) {
+                        quantityInput.value = this.initialQuantity;
+                    }
+                },
                 updateProduct(event) {
-                    const opt = event.target.options[event.target.selectedIndex];
-                    this.pricePerUnit = parseFloat(opt.dataset.price || 0);
-                    this.updateTotal();
+                    // No price calculation - admin will determine pricing
                 },
                 updateTotal() {
-                    const qty = parseInt(document.getElementById('quantity').value, 10) || 0;
-                    this.quantity = qty;
-                    this.total = qty > 0 && this.pricePerUnit > 0 ? qty * this.pricePerUnit : 0;
+                    // No total calculation - admin will determine pricing
                 },
             };
         }
