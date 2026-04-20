@@ -68,11 +68,13 @@ class SiteController extends Controller
     public function products()
     {
         $products = BrickProduct::active()
-            ->orderBy('category')
+            ->with('categoryModel')
+            ->orderByRaw('category_id is null')
+            ->orderBy('category_id')
             ->orderBy('name')
             ->get();
 
-        $grouped = $products->groupBy('category');
+        $grouped = $products->groupBy(fn (BrickProduct $product) => $product->category ?? 'Other');
         $categoryShowcase = $grouped
             ->map(fn ($items, $category) => $this->categoryMetaFor($category, $items))
             ->values();
@@ -92,8 +94,9 @@ class SiteController extends Controller
     {
         abort_if(! $product->is_active, 404);
 
-        $related = BrickProduct::active()
-            ->where('category', $product->category)
+        $product->loadMissing('categoryModel');
+
+        $related = $this->productsForCategory($product->category ?? 'Other')
             ->where('id', '!=', $product->id)
             ->take(4)
             ->get();
@@ -115,8 +118,7 @@ class SiteController extends Controller
         abort_unless(isset($categoryMap[$slug]), 404);
 
         $categoryName     = $categoryMap[$slug];
-        $categoryProducts = BrickProduct::active()
-            ->where('category', $categoryName)
+        $categoryProducts = $this->productsForCategory($categoryName)
             ->orderBy('name')
             ->get();
         $categoryMeta = $this->categoryMetaFor($categoryName, $categoryProducts);
@@ -357,6 +359,7 @@ class SiteController extends Controller
     {
         return BrickProduct::active()
             ->with('categoryModel')
+            ->orderByRaw('category_id is null')
             ->orderBy('category_id')
             ->orderBy('name')
             ->get(['id', 'name', 'category_id', 'description', 'image'])
@@ -366,6 +369,21 @@ class SiteController extends Controller
             })
             ->values()
             ->toArray();
+    }
+
+    private function productsForCategory(string $categoryName)
+    {
+        return BrickProduct::active()
+            ->with('categoryModel')
+            ->where(function ($query) use ($categoryName) {
+                $query->whereHas('categoryModel', function ($categoryQuery) use ($categoryName) {
+                    $categoryQuery->where('name', $categoryName);
+                });
+
+                if ($categoryName === 'Other') {
+                    $query->orWhereNull('category_id');
+                }
+            });
     }
 
     private function sharedData(array $overrides = []): array

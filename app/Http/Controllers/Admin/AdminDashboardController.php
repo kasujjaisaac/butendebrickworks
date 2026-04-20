@@ -13,6 +13,7 @@ use App\Models\User;
 use App\Support\EditableSiteContent;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class AdminDashboardController extends Controller
@@ -57,14 +58,19 @@ class AdminDashboardController extends Controller
             ->count();
 
         // ── Products ─────────────────────────────────────────────────────
-        $totalProducts    = BrickProduct::query()->count();
-        $activeProducts   = BrickProduct::query()->where('is_active', true)->count();
-        $productFamilies  = BrickProduct::query()->distinct()->count('category');
-        $productByCategory = BrickProduct::query()
-            ->select('category', DB::raw('count(*) as total'))
-            ->groupBy('category')
-            ->orderByDesc('total')
-            ->get();
+        $productInventory = BrickProduct::query()->with('categoryModel')->get();
+        $totalProducts    = $productInventory->count();
+        $activeProducts   = $productInventory->where('is_active', true)->count();
+        $productByCategory = $productInventory
+            ->groupBy(fn (BrickProduct $product) => $product->category ?? 'Other')
+            ->map(fn ($items, $category) => [
+                'slug'  => Str::slug($category),
+                'name'  => $category,
+                'count' => $items->count(),
+            ])
+            ->sortByDesc('count')
+            ->values();
+        $productFamilies  = $productByCategory->count();
 
         // ── Reviews ───────────────────────────────────────────────────────
         $totalReviews    = Review::query()->count();
@@ -86,11 +92,7 @@ class AdminDashboardController extends Controller
         $company = EditableSiteContent::company();
 
         // ── Product breakdown (formatted for view) ────────────────────────
-        $productBreakdown = $productByCategory->map(fn($item) => [
-            'slug'  => $item->category,
-            'name'  => ucwords(str_replace('-', ' ', $item->category)),
-            'count' => $item->total,
-        ]);
+        $productBreakdown = $productByCategory;
 
         // ── Chart: orders per day last 30 days ────────────────────────────
         $ordersLast30 = Order::query()

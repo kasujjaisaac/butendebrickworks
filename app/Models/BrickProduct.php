@@ -46,13 +46,11 @@ class BrickProduct extends Model
      */
     public function getCategoryAttribute(): ?string
     {
-        // If category relationship exists, use it
         if ($this->relationLoaded('categoryModel') && $this->categoryModel) {
             return $this->categoryModel->name;
         }
-        
-        // Fall back to the relationship name if not loaded
-        return $this->categoryModel?->name;
+
+        return $this->categoryModel?->name ?? ($this->attributes['category'] ?? null);
     }
 
     /**

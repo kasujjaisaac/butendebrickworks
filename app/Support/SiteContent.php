@@ -31,7 +31,7 @@ class SiteContent
                 '+256 752 698 301',
                 '+256 775 505 661',
             ],
-            'primary_phone_href' => '256775505661',
+            'primary_phone_href' => '256782783078',
             'whatsapp_href' => '256775505661',
             'address' => 'Matanga, Masaka, Uganda',
             'address_hint' => 'PRXP+V2, Butende',
