@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\ProductCalculatorMetrics;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -55,19 +56,27 @@ class BrickProduct extends Model
 
     /**
      * The effective coverage per unit in sqm.
-     * Prefers the explicit coverage_sqm column; falls back to deriving from bricks_per_square_metre.
+     * Supports both true per-unit coverage values and legacy "units per m²" values
+     * that were accidentally stored in coverage_sqm.
      */
     public function getCoverageAttribute(): float
     {
-        if ($this->coverage_sqm && $this->coverage_sqm > 0) {
-            return (float) $this->coverage_sqm;
-        }
+        return ProductCalculatorMetrics::resolveCoverage(
+            $this->attributes['coverage_sqm'] ?? null,
+            isset($this->attributes['bricks_per_square_metre']) ? (int) $this->attributes['bricks_per_square_metre'] : null,
+        );
+    }
 
-        if ($this->bricks_per_square_metre > 0) {
-            return round(1 / $this->bricks_per_square_metre, 6);
-        }
-
-        return 0;
+    /**
+     * The effective units required per square metre.
+     * Prefers a real coverage-per-unit value when present so stale defaults do not win.
+     */
+    public function getUnitsPerSquareMetreAttribute(): int
+    {
+        return ProductCalculatorMetrics::resolveUnitsPerSquareMetre(
+            $this->attributes['coverage_sqm'] ?? null,
+            isset($this->attributes['bricks_per_square_metre']) ? (int) $this->attributes['bricks_per_square_metre'] : null,
+        );
     }
 
     public function quotations(): HasMany

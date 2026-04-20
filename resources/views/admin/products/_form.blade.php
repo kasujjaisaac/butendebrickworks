@@ -215,32 +215,63 @@
                     @error('dimensions_inch')<p class="mt-1.5 text-xs text-red-600">{{ $message }}</p>@enderror
                 </div>
 
-                {{-- Coverage sqm --}}
+                {{-- Units per square metre --}}
                 <div>
-                    <label for="coverage_sqm" class="block text-sm font-medium text-stone-700 mb-1.5">
-                        Coverage / unit
+                    <label for="bricks_per_square_metre" class="block text-sm font-medium text-stone-700 mb-1.5">
+                        Units per m²
                         <span class="ml-1 inline-flex items-center rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold text-amber-700 uppercase tracking-wide">calculator</span>
                     </label>
                     <div class="relative">
-                        <input type="number" id="coverage_sqm" name="coverage_sqm" step="0.000001" min="0"
-                               value="{{ old('coverage_sqm', $product->coverage_sqm ?? '') }}"
-                               placeholder="0.016667"
+                        <input type="number" id="bricks_per_square_metre" name="bricks_per_square_metre" step="1" min="1"
+                               value="{{ old('bricks_per_square_metre', $product->units_per_square_metre ?: '') }}"
+                               placeholder="60"
                                class="w-full rounded-lg border px-4 py-2.5 pr-11 text-sm text-stone-900 placeholder-stone-400 shadow-sm transition focus:outline-none focus:ring-2 focus:ring-[#b86033]/25
-                                      {{ $errors->has('coverage_sqm') ? 'border-red-400 bg-red-50' : 'border-[#d8c0ad] bg-white focus:border-[#b86033]' }}">
-                        <span class="pointer-events-none absolute right-0 top-0 bottom-0 flex items-center justify-center w-10 rounded-r-lg border-l border-[#d8c0ad] bg-stone-50 text-xs font-medium text-stone-500">m²</span>
+                                      {{ $errors->has('bricks_per_square_metre') ? 'border-red-400 bg-red-50' : 'border-[#d8c0ad] bg-white focus:border-[#b86033]' }}">
+                        <span class="pointer-events-none absolute right-0 top-0 bottom-0 flex items-center justify-center w-14 rounded-r-lg border-l border-[#d8c0ad] bg-stone-50 text-xs font-medium text-stone-500">units</span>
                     </div>
-                    @error('coverage_sqm')<p class="mt-1.5 text-xs text-red-600">{{ $message }}</p>@enderror
+                    @error('bricks_per_square_metre')<p class="mt-1.5 text-xs text-red-600">{{ $message }}</p>@enderror
                 </div>
 
-                {{-- Coverage help note --}}
+                {{-- Calculator help note --}}
                 <div class="flex gap-2.5 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
                     <svg class="mt-0.5 h-4 w-4 shrink-0 text-amber-500" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 0 0 1.5-.189m-1.5.189a6.01 6.01 0 0 1-1.5-.189m3.75 7.478a12.06 12.06 0 0 1-4.5 0m3.75 2.383a14.406 14.406 0 0 1-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 1 0-7.517 0c.85.493 1.509 1.333 1.509 2.316V18"/>
                     </svg>
                     <p class="text-xs text-amber-800 leading-relaxed">
-                        <strong class="font-semibold">Coverage tip:</strong>
-                        Coverage = 1 ÷ (units per m²). A standard brick at 60 per m² covers <strong>0.016667 m²</strong>. This value powers the online calculator.
+                        <strong class="font-semibold">Calculator tip:</strong>
+                        Enter how many units are needed for <strong>1 m²</strong>. A standard brick is about <strong>60 units per m²</strong>. We will automatically convert that into per-unit coverage for the calculator.
                     </p>
+                </div>
+
+                <div id="calculator-preview-panel" class="rounded-lg border border-[#d8c0ad] bg-[#fcfaf8] px-4 py-4">
+                    <div class="flex items-start justify-between gap-3">
+                        <div>
+                            <p class="text-sm font-semibold text-stone-800">Live Calculator Preview</p>
+                            <p id="calc-preview-summary" class="mt-1 text-xs leading-5 text-stone-500">Update the calculator fields to preview how this product will behave on the public site.</p>
+                        </div>
+                        <span id="calc-preview-badge" class="inline-flex rounded-full bg-stone-100 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-stone-500">Waiting</span>
+                    </div>
+
+                    <div class="mt-4 grid gap-3 sm:grid-cols-2">
+                        <div class="rounded-lg border border-stone-200 bg-white px-3 py-3">
+                            <p class="text-[10px] font-semibold uppercase tracking-[0.16em] text-stone-400">Coverage per unit</p>
+                            <p id="calc-preview-coverage" class="mt-2 text-sm font-semibold text-stone-900">—</p>
+                        </div>
+                        <div class="rounded-lg border border-stone-200 bg-white px-3 py-3">
+                            <p class="text-[10px] font-semibold uppercase tracking-[0.16em] text-stone-400">Units for 1 m²</p>
+                            <p id="calc-preview-1sqm" class="mt-2 text-sm font-semibold text-stone-900">—</p>
+                        </div>
+                        <div class="rounded-lg border border-stone-200 bg-white px-3 py-3">
+                            <p class="text-[10px] font-semibold uppercase tracking-[0.16em] text-stone-400">Units for 10 m²</p>
+                            <p id="calc-preview-10sqm" class="mt-2 text-sm font-semibold text-stone-900">—</p>
+                        </div>
+                        <div class="rounded-lg border border-stone-200 bg-white px-3 py-3">
+                            <p class="text-[10px] font-semibold uppercase tracking-[0.16em] text-stone-400">Units for 50 m²</p>
+                            <p id="calc-preview-50sqm" class="mt-2 text-sm font-semibold text-stone-900">—</p>
+                        </div>
+                    </div>
+
+                    <div id="calc-preview-warning" class="mt-4 hidden rounded-lg border px-3 py-3 text-xs leading-5"></div>
                 </div>
 
             </div>
@@ -287,5 +318,81 @@
                 loadFile(file);
             }
         });
+    })();
+
+    (function () {
+        const nameInput = document.getElementById('name');
+        const categoryInput = document.getElementById('category');
+        const dimensionsInput = document.getElementById('dimensions_inch');
+        const unitsInput = document.getElementById('bricks_per_square_metre');
+        const summary = document.getElementById('calc-preview-summary');
+        const badge = document.getElementById('calc-preview-badge');
+        const coverage = document.getElementById('calc-preview-coverage');
+        const oneSqm = document.getElementById('calc-preview-1sqm');
+        const tenSqm = document.getElementById('calc-preview-10sqm');
+        const fiftySqm = document.getElementById('calc-preview-50sqm');
+        const warning = document.getElementById('calc-preview-warning');
+        const numberFormatter = new Intl.NumberFormat('en-UG');
+
+        if (!unitsInput || !summary || !badge || !coverage || !oneSqm || !tenSqm || !fiftySqm || !warning) {
+            return;
+        }
+
+        function setWarning(message, tone) {
+            if (!message) {
+                warning.textContent = '';
+                warning.className = 'mt-4 hidden rounded-lg border px-3 py-3 text-xs leading-5';
+                return;
+            }
+
+            warning.textContent = message;
+            warning.className = tone === 'warn'
+                ? 'mt-4 rounded-lg border border-amber-200 bg-amber-50 px-3 py-3 text-xs leading-5 text-amber-800'
+                : 'mt-4 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-3 text-xs leading-5 text-emerald-800';
+        }
+
+        function updatePreview() {
+            const productName = (nameInput?.value || 'This product').trim() || 'This product';
+            const category = (categoryInput?.value || 'selected category').trim() || 'selected category';
+            const dimensions = (dimensionsInput?.value || '').trim();
+            const units = parseInt(unitsInput.value, 10);
+
+            summary.textContent = productName + ' in ' + category + ' will use the calculator values shown below' + (dimensions ? ' with dimensions ' + dimensions + '.' : '.');
+
+            if (!Number.isFinite(units) || units <= 0) {
+                badge.textContent = 'Waiting';
+                badge.className = 'inline-flex rounded-full bg-stone-100 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-stone-500';
+                coverage.textContent = '—';
+                oneSqm.textContent = '—';
+                tenSqm.textContent = '—';
+                fiftySqm.textContent = '—';
+                setWarning('Enter a units-per-square-metre value to power the public calculator and quotations.', 'warn');
+                return;
+            }
+
+            const derivedCoverage = 1 / units;
+
+            badge.textContent = 'Ready';
+            badge.className = 'inline-flex rounded-full bg-emerald-100 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-emerald-700';
+            coverage.textContent = derivedCoverage.toFixed(6) + ' m² / unit';
+            oneSqm.textContent = numberFormatter.format(units) + ' units';
+            tenSqm.textContent = numberFormatter.format(units * 10) + ' units';
+            fiftySqm.textContent = numberFormatter.format(units * 50) + ' units';
+
+            if (units < 4) {
+                setWarning('This value is unusually low. Double-check that you entered units needed for 1 m², not total units for a full project.', 'warn');
+            } else if (units > 500) {
+                setWarning('This value is unusually high. Make sure the figure is units per 1 m² and not a whole-order quantity.', 'warn');
+            } else {
+                setWarning('These values look ready for the public calculator and quotation flow.', 'ok');
+            }
+        }
+
+        [nameInput, categoryInput, dimensionsInput, unitsInput].forEach((field) => {
+            field?.addEventListener('input', updatePreview);
+            field?.addEventListener('change', updatePreview);
+        });
+
+        updatePreview();
     })();
 </script>

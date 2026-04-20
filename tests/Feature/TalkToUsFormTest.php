@@ -72,3 +72,43 @@ it('stores hero quote requests', function () {
         'subject' => 'Request for Quote',
     ]);
 });
+
+it('silently discards honeypot talk to us submissions', function () {
+    $response = $this->from('/contact')
+        ->post(route('talk-to-us.store'), [
+            'name' => 'Spam Bot',
+            'email' => 'bot@example.com',
+            'subject' => 'Spam',
+            'message' => 'This should never be stored as a real enquiry.',
+            'source_url' => 'http://localhost/contact',
+            'website' => 'https://spam.invalid',
+        ]);
+
+    $response
+        ->assertRedirect('/contact')
+        ->assertSessionHas('talk_to_us_success');
+
+    expect(ContactMessage::query()->count())->toBe(0);
+});
+
+it('rate limits repeated talk to us submissions', function () {
+    $payload = [
+        'name' => 'Rate Limited User',
+        'email' => 'limited@example.com',
+        'subject' => 'Bulk brick enquiry',
+        'message' => 'We are planning a project and need product guidance for a real submission.',
+        'source_url' => 'http://localhost/contact',
+    ];
+
+    foreach (range(1, 5) as $attempt) {
+        $this->from('/contact')
+            ->post(route('talk-to-us.store'), $payload)
+            ->assertRedirect('/contact');
+    }
+
+    $this->from('/contact')
+        ->post(route('talk-to-us.store'), $payload)
+        ->assertStatus(429);
+
+    expect(ContactMessage::query()->count())->toBe(5);
+});

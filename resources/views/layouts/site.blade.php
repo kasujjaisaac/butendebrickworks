@@ -347,10 +347,17 @@
                                     </div>
                                 @endif
 
+                                @if ($errors->has('form'))
+                                    <div class="mt-4 rounded-sm border border-rose-400/30 bg-rose-400/10 px-4 py-3 text-xs font-medium text-rose-200">
+                                        {{ $errors->first('form') }}
+                                    </div>
+                                @endif
+
                                 <form method="POST" action="{{ route('talk-to-us.store') }}" class="mt-4 grid gap-2.5">
                                     @csrf
                                     <input type="hidden" name="enquiry_type" value="quote">
                                     <input type="hidden" name="source_url" value="{{ url()->current() }}">
+                                    @include('site.partials.public-form-hardening-fields', ['honeypotId' => 'footer-quote-honeypot'])
 
                                     <input type="text" name="name" value="{{ old('name') }}"
                                         class="footer-input" placeholder="Your name" required>
@@ -368,6 +375,9 @@
                                                 class="text-stone-900">{{ $cat['name'] }}</option>
                                         @endforeach
                                     </select>
+
+                                    <input type="text" name="project_type" value="{{ old('project_type') }}"
+                                        class="footer-input" placeholder="Project type" required>
 
                                     <input type="text" name="quantity" value="{{ old('quantity') }}"
                                         class="footer-input" placeholder="Quantity or scope" required>

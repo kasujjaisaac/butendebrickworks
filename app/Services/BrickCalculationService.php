@@ -9,18 +9,19 @@ class BrickCalculationService
     /**
      * Calculate units required and total price from a BrickProduct.
      *
-     * Uses coverage_sqm if set, otherwise falls back to bricks_per_square_metre.
+     * Uses the normalized model accessors so both old and new product data calculate correctly.
      *
      * @return array{bricks_required: int, total_price: float}
      */
     public function calculateForProduct(float $squareMetres, BrickProduct $product): array
     {
-        $coverage = $product->coverage; // uses the getCoverageAttribute accessor
+        $coverage = $product->coverage;
+        $unitsPerSquareMetre = $product->units_per_square_metre;
 
         if ($coverage > 0) {
             $unitsRequired = (int) ceil($squareMetres / $coverage);
         } else {
-            $unitsRequired = (int) ceil($squareMetres * $product->bricks_per_square_metre);
+            $unitsRequired = (int) ceil($squareMetres * $unitsPerSquareMetre);
         }
 
         $totalPrice = round($unitsRequired * (float) $product->price_per_brick, 2);

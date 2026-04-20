@@ -47,7 +47,13 @@
         ],
         "test": [
             "@php artisan config:clear --ansi",
-            "@php artisan test"
+            "@php vendor/bin/pest --compact"
+        ],
+        "qa": [
+            "@php artisan config:clear --ansi",
+            "@php artisan products:sync-calculator-data --dry-run",
+            "@php artisan health:check --json",
+            "@php vendor/bin/pest --compact"
         ],
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",

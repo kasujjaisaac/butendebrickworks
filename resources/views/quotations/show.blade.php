@@ -50,7 +50,7 @@
                         </div>
                         <div class="flex items-center justify-between py-3">
                             <dt class="text-sm text-stone-500">Units per m²</dt>
-                            <dd class="text-sm font-semibold text-stone-900">{{ $quotation->product->bricks_per_square_metre }}</dd>
+                            <dd class="text-sm font-semibold text-stone-900">{{ $quotation->product->units_per_square_metre }}</dd>
                         </div>
                         <div class="flex items-center justify-between py-3">
                             <dt class="text-sm text-stone-500">Units Required</dt>
@@ -60,7 +60,7 @@
 
                     <p class="mt-3 text-xs text-stone-400">
                         * {{ number_format($quotation->square_metres, 2) }} m² &times;
-                        {{ $quotation->product->bricks_per_square_metre }} units/m²
+                        {{ $quotation->product->units_per_square_metre }} units/m²
                     </p>
                 </div>
 

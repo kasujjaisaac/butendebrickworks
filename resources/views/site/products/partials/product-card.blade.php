@@ -39,7 +39,7 @@
         <table class="w-full text-xs border-t border-stone-100">
             <tr class="text-stone-400">
                 <th class="py-1 px-2 font-semibold text-center border-r border-stone-200">Weight (kg)</th>
-                <th class="py-1 px-2 font-semibold text-center border-r border-stone-200">Space Covered per sqm</th>
+                <th class="py-1 px-2 font-semibold text-center border-r border-stone-200">Units per m²</th>
                 <th class="py-1 px-2 font-semibold text-center">Dimensions (inch)</th>
             </tr>
             <tr class="text-stone-900">
@@ -51,8 +51,8 @@
                     @endif
                 </td>
                 <td class="py-1 px-2 text-center border-r border-stone-200">
-                    @if ($product->coverage_sqm !== null)
-                        {{ (int) $product->coverage_sqm }}
+                    @if ($product->units_per_square_metre > 0)
+                        {{ $product->units_per_square_metre }}
                     @else
                         —
                     @endif

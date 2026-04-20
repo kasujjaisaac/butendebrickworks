@@ -68,8 +68,8 @@
                     'name'         => $p->name,
                     'category'     => $p->category,
                     'categoryKey'  => \Illuminate\Support\Str::slug($p->category ?: 'other'),
-                    'coverage'     => (float) ($p->coverage_sqm ?? 0),
-                    'bpsm'         => (int) ($p->bricks_per_square_metre ?? 0),
+                    'coverage'     => (float) $p->coverage,
+                    'bpsm'         => (int) $p->units_per_square_metre,
                 ]) ->values()->toJson() }})"
                      x-init="init()"
                      @keydown.escape.window="closeEstimateModal()"

@@ -45,7 +45,7 @@
                             @foreach ($products as $product)
                                 <option
                                     value="{{ $product->id }}"
-                                    data-bpsm="{{ $product->bricks_per_square_metre }}"
+                                    data-bpsm="{{ $product->units_per_square_metre }}"
                                     data-coverage="{{ $product->coverage }}"
                                     {{ (old('brick_product_id') ?? $preProductId) == $product->id ? 'selected' : '' }}
                                 >

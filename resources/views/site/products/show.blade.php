@@ -94,10 +94,10 @@
                                 <dd class="font-mono text-xs font-semibold text-stone-900">{{ $product->weight_kg }} kg</dd>
                             </div>
                         @endif
-                        @if ($product->bricks_per_square_metre)
+                        @if ($product->units_per_square_metre)
                             <div class="flex items-center justify-between px-5 py-3">
                                 <dt class="text-xs font-medium text-stone-500">Units per m²</dt>
-                                <dd class="font-mono text-xs font-semibold text-stone-900">{{ $product->bricks_per_square_metre }}</dd>
+                                <dd class="font-mono text-xs font-semibold text-stone-900">{{ $product->units_per_square_metre }}</dd>
                             </div>
                         @endif
                         @if ($product->coverage > 0)

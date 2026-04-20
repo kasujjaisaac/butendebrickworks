@@ -1,58 +1,163 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Butende Brick Works
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Laravel application for the public Butende Brick Works website, customer quotation flow, ordering flow, and private admin dashboard.
 
-## About Laravel
+## Requirements
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- PHP 8.3+
+- Composer
+- Node.js 20+
+- SQLite or MySQL
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
-
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
-
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## Local Setup
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+composer install
+cp .env.example .env
+php artisan key:generate
+touch database/database.sqlite
+php artisan migrate --force
+npm install
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Run the app locally:
 
-## Contributing
+```bash
+composer dev
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## Quality Checks
 
-## Code of Conduct
+Run the full repo safety checks before pushing:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+composer qa
+npm run build
+```
 
-## Security Vulnerabilities
+Important commands:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+- `php artisan products:sync-calculator-data --dry-run`
+  Shows calculator metric issues without changing data.
+- `php artisan products:sync-calculator-data`
+  Normalizes product calculator data so `coverage_sqm` and `bricks_per_square_metre` stay consistent.
+- `php artisan health:check`
+  Runs production-oriented dependency checks with a failing exit code if the app is unhealthy.
+- `php artisan health:check --json`
+  Same health check in machine-readable JSON.
 
-## License
+## Calculator Data Integrity
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+The calculator stores two linked values on each product:
+
+- `bricks_per_square_metre`: units required for `1 m²`
+- `coverage_sqm`: area covered by one unit
+
+Admin users should enter `Units per m²` in the product form. The system will derive `coverage_sqm` automatically.
+
+If older data was entered incorrectly, repair it with:
+
+```bash
+php artisan products:sync-calculator-data
+```
+
+## Monitoring
+
+HTTP health endpoint:
+
+```text
+GET /health
+```
+
+The endpoint returns:
+
+- `200` when all critical checks pass
+- `503` when a critical dependency fails
+
+It checks:
+
+- application key presence
+- database connectivity and required tables
+- cache round-trip
+- writable storage paths
+- public storage link presence
+
+Request observability:
+
+- every web response receives an `X-Request-Id` header
+- exceptions include request context in logs
+- slow requests and server-error responses are written to the `monitoring` log stack
+
+Useful monitoring env vars:
+
+- `APP_RELEASE`
+- `LOG_MONITORING_CHANNELS`
+- `SLOW_REQUEST_THRESHOLD_MS`
+
+Console health monitoring:
+
+```bash
+php artisan health:check --json
+```
+
+The app also schedules `health:check --json` every 5 minutes. Make sure the Laravel scheduler is running in production:
+
+```bash
+* * * * * php /path/to/project/artisan schedule:run >> /dev/null 2>&1
+```
+
+If you configure `LOG_MONITORING_CHANNELS`, failed health checks will be logged to that stack.
+
+## Public Form Hardening
+
+The public `talk-to-us` and quote forms now include:
+
+- per-IP and per-email throttling
+- a honeypot field that silently drops obvious bot submissions
+- request-id logging for suspicious form traffic
+
+If you need to tune the limits, update:
+
+- `TALK_TO_US_PER_MINUTE`
+- `TALK_TO_US_PER_HOUR`
+- `TALK_TO_US_HONEYPOT_FIELD`
+
+## Deployment
+
+Recommended deployment flow:
+
+```bash
+git pull
+composer install --no-dev --optimize-autoloader
+npm ci
+npm run build
+php artisan migrate --force
+php artisan optimize:clear
+php artisan products:sync-calculator-data
+php artisan health:check
+php artisan storage:link
+```
+
+Post-deploy smoke test:
+
+- `/`
+- `/products`
+- `/products/bricks`
+- `/brick-calculator`
+- `/health`
+
+## CI
+
+GitHub Actions runs the following on every push and pull request:
+
+- `composer validate`
+- dependency installation
+- database migrations
+- calculator data dry-run audit
+- production health check
+- Pest test suite
+- Vite production build
+
+Workflow file:
+
+- [.github/workflows/ci.yml](.github/workflows/ci.yml)

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\BrickProduct;
 use App\Models\ProductCategory;
+use App\Support\ProductCalculatorMetrics;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -146,7 +147,7 @@ class ProductsController extends Controller
             'image'                  => [$imageRule, 'image', 'mimes:jpg,jpeg,png,webp', 'max:3072'],
             'weight_kg'              => ['nullable', 'numeric', 'min:0', 'max:9999'],
             'dimensions_inch'        => ['nullable', 'string', 'max:80'],
-            'coverage_sqm'           => ['nullable', 'numeric', 'min:0.000001', 'max:100'],
+            'bricks_per_square_metre' => ['required', 'integer', 'min:1', 'max:10000'],
             'is_active'              => ['boolean'],
         ]);
     }
@@ -165,6 +166,12 @@ class ProductsController extends Controller
         $validated['category_id'] = ProductCategory::query()
             ->firstOrCreate(['name' => $validated['category']])
             ->id;
+        $normalizedMetrics = ProductCalculatorMetrics::normalize(
+            null,
+            (int) $validated['bricks_per_square_metre'],
+        );
+        $validated['coverage_sqm'] = $normalizedMetrics['coverage_sqm'];
+        $validated['bricks_per_square_metre'] = $normalizedMetrics['bricks_per_square_metre'];
 
         unset($validated['category']);
 

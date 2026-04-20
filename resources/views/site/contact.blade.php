@@ -119,7 +119,7 @@
                     @if ($errors->any())
                         <div class="mt-6 flex items-start gap-3 rounded-sm border border-rose-200 bg-rose-50 px-5 py-4">
                             <svg class="mt-0.5 h-5 w-5 shrink-0 text-rose-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"/></svg>
-                            <p class="text-sm font-medium text-rose-700">Please review the highlighted fields and try again.</p>
+                            <p class="text-sm font-medium text-rose-700">{{ $errors->first('form') ?: 'Please review the highlighted fields and try again.' }}</p>
                         </div>
                     @endif
 
@@ -143,6 +143,7 @@
                         @csrf
                         <input type="hidden" name="source_url" value="{{ url()->current() }}">
                         <input type="hidden" name="enquiry_type" :value="tab">
+                        @include('site.partials.public-form-hardening-fields', ['honeypotId' => 'contact-honeypot'])
 
                         {{-- Name + Email --}}
                         <div class="grid gap-4 sm:grid-cols-2">
@@ -338,4 +339,3 @@
     </section>
 
 @endsection
-

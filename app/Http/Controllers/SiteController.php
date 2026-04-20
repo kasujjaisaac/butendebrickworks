@@ -11,6 +11,7 @@ use App\Support\EditableSiteContent;
 use App\Support\SiteContent;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -174,7 +175,7 @@ class SiteController extends Controller
             'name' => $product->name,
             'category' => $product->category ?? 'Other',
             'coverage' => (float) $product->coverage,
-            'bricks_per_square_metre' => (int) $product->bricks_per_square_metre,
+            'bricks_per_square_metre' => (int) $product->units_per_square_metre,
         ])->values();
 
         return view('site.calculator', $this->sharedData([
@@ -187,12 +188,17 @@ class SiteController extends Controller
 
     public function storeTalkToUs(Request $request): RedirectResponse
     {
+        if ($blockedResponse = $this->blockSuspiciousTalkToUsSubmission($request)) {
+            return $blockedResponse;
+        }
+
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:120'],
             'email' => ['required', 'email', 'max:160'],
             'phone' => ['nullable', 'string', 'max:40'],
             'source_url' => ['nullable', 'string', 'max:255'],
             'enquiry_type' => ['nullable', 'string', 'max:40'],
+            'website' => ['nullable', 'string', 'max:255'],
             'product_interest' => ['nullable', 'string', 'max:120'],
             'project_type' => ['nullable', 'string', 'max:120'],
             'quantity' => ['nullable', 'string', 'max:120'],
@@ -244,6 +250,25 @@ class SiteController extends Controller
 
         return back()
             ->with('talk_to_us_success', 'Thanks for reaching out. We have received your message and will get back to you soon.');
+    }
+
+    private function blockSuspiciousTalkToUsSubmission(Request $request): ?RedirectResponse
+    {
+        $honeypotField = config('monitoring.talk_to_us.honeypot_field', 'website');
+
+        if (blank($request->input($honeypotField))) {
+            return null;
+        }
+
+        Log::channel('monitoring')->warning('Talk-to-us submission blocked by honeypot.', [
+            'request_id' => $request->attributes->get('request_id'),
+            'source_url' => $request->input('source_url'),
+            'enquiry_type' => $request->input('enquiry_type'),
+            'request_ip' => $request->ip(),
+            'user_agent' => Str::limit((string) $request->userAgent(), 180),
+        ]);
+
+        return back()->with('talk_to_us_success', 'Thanks for reaching out. We have received your message and will get back to you soon.');
     }
 
     public function newsList()

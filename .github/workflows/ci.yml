@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, pdo_sqlite, sqlite3
+          coverage: none
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Validate composer.json
+        run: composer validate --strict
+
+      - name: Prepare application environment file
+        run: cp .env.example .env
+
+      - name: Install PHP dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Install Node.js dependencies
+        run: npm ci
+
+      - name: Prepare application environment
+        run: |
+          touch database/database.sqlite
+          php artisan key:generate --ansi
+
+      - name: Run database migrations
+        run: php artisan migrate --force --ansi
+
+      - name: Verify calculator data normalization
+        run: php artisan products:sync-calculator-data --dry-run
+
+      - name: Run production health checks
+        run: php artisan health:check --json
+
+      - name: Run automated tests
+        run: composer test
+
+      - name: Build frontend assets
+        run: npm run build

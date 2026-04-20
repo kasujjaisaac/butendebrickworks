@@ -16,10 +16,14 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\QuotationController;
 use App\Http\Controllers\TrackingController;
+use App\Http\Controllers\HealthCheckController;
 use App\Http\Controllers\Admin\ProductsController as AdminProductsController;
 use App\Support\SiteContent;
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Str;
+use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 $productSlugPattern = implode('|', array_map(
     fn (string $cat) => preg_quote(Str::slug($cat), '/'),
@@ -27,6 +31,10 @@ $productSlugPattern = implode('|', array_map(
 ));
 
 Route::redirect('/home', '/', 301);
+
+Route::get('/health', HealthCheckController::class)
+    ->withoutMiddleware([StartSession::class, ShareErrorsFromSession::class, PreventRequestForgery::class])
+    ->name('health.check');
 
 Route::controller(SiteController::class)->group(function () use ($productSlugPattern) {
     Route::get('/', 'home')->name('home');
@@ -39,7 +47,7 @@ Route::controller(SiteController::class)->group(function () use ($productSlugPat
     Route::get('/help-center', 'faq')->name('faq');
     Route::get('/faq', 'faq');
     Route::get('/contact', 'contact')->name('contact');
-    Route::post('/talk-to-us', 'storeTalkToUs')->name('talk-to-us.store');
+    Route::post('/talk-to-us', 'storeTalkToUs')->middleware('throttle:talk-to-us')->name('talk-to-us.store');
     Route::get('/brick-calculator', 'calculator')->name('calculator');
     Route::get('/news', 'newsList')->name('news.list');
     Route::get('/news/{slug}', 'newsShow')->name('news.show');

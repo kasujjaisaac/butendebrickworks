@@ -24,13 +24,14 @@
 
     @if ($errors->any())
         <div class="{{ $errorNoticeClass }}">
-            Please review the form and try again.
+            {{ $errors->first('form') ?: 'Please review the form and try again.' }}
         </div>
     @endif
 
     <form method="POST" action="{{ route('talk-to-us.store') }}" class="grid gap-5">
         @csrf
         <input type="hidden" name="source_url" value="{{ url()->current() }}">
+        @include('site.partials.public-form-hardening-fields', ['honeypotId' => 'talk-to-us-honeypot'])
 
         {{-- Row 1: Name + Email --}}
         <div class="grid gap-4 sm:grid-cols-2">

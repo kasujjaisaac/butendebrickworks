@@ -58,6 +58,12 @@ return [
             'ignore_exceptions' => false,
         ],
 
+        'monitoring' => [
+            'driver' => 'stack',
+            'channels' => array_values(array_filter(explode(',', (string) env('LOG_MONITORING_CHANNELS', 'daily')))),
+            'ignore_exceptions' => false,
+        ],
+
         'single' => [
             'driver' => 'single',
             'path' => storage_path('logs/laravel.log'),
