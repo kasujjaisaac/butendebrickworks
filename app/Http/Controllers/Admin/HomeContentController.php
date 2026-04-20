@@ -147,6 +147,45 @@ class HomeContentController extends Controller
         return redirect()->route('admin.home.projects-in-use.index')->with('status', 'Project deleted successfully.');
     }
 
+    public function updateProjectsInUse(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'items' => ['required', 'array'],
+            'items.*.caption' => ['required', 'string', 'max:200'],
+            'items.*.product' => ['required', 'string', 'max:100'],
+            'items.*.category' => ['required', 'string', 'max:100'],
+            'items.*.tag' => ['required', 'string', 'max:100'],
+            'items.*.span' => ['nullable', 'string', 'in:normal,wide'],
+            'items.*.image_upload' => ['nullable', 'file', 'image', 'max:6144'],
+        ]);
+
+        $projects = [];
+        $index = 0;
+
+        foreach ($validated['items'] as $item) {
+            $imagePath = $item['image'] ?? '';
+
+            if ($request->hasFile("items.{$index}.image_upload")) {
+                $imagePath = $this->storePublicImage($request->file("items.{$index}.image_upload"), $imagePath);
+            }
+
+            $projects[] = [
+                'image' => $imagePath,
+                'caption' => $item['caption'],
+                'product' => $item['product'],
+                'category' => $item['category'],
+                'tag' => $item['tag'],
+                'span' => $item['span'] ?? 'normal',
+            ];
+
+            $index++;
+        }
+
+        $this->storeSetting('projects_in_use', $projects);
+
+        return redirect()->route('admin.home.projects-in-use.index')->with('status', 'Projects gallery updated successfully.');
+    }
+
     public function updateCompany(Request $request): RedirectResponse
     {
         $validated = $request->validate([

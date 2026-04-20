@@ -62,7 +62,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::put('/home/company', [HomeContentController::class, 'updateCompany'])->name('home.company.update');
     Route::put('/home/stats', [HomeContentController::class, 'updateStats'])->name('home.stats.update');
     Route::put('/home/capabilities', [HomeContentController::class, 'updateCapabilities'])->name('home.capabilities.update');
-    Route::get('/home/projects-in-use', [HomeContentController::class, 'indexProjectsInUse'])->name('home.projects-in-use.index');
+    Route::put('/home/projects-in-use', [HomeContentController::class, 'updateProjectsInUse'])->name('home.projects-in-use.update');
     Route::get('/home/projects-in-use/create', [HomeContentController::class, 'createProject'])->name('home.projects-in-use.create');
     Route::post('/home/projects-in-use', [HomeContentController::class, 'storeProject'])->name('home.projects-in-use.store');
     Route::get('/home/projects-in-use/{index}/edit', [HomeContentController::class, 'editProject'])->name('home.projects-in-use.edit');

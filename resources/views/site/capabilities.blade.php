@@ -23,8 +23,7 @@
 
     {{-- ===== PRODUCTS IN USE ===== --}}
     @if($projectsInUse)
-        @php $project = $projectsInUse[0]; @endphp
-        <script type="application/json" id="projects-data">@json([$project])</script>
+        <script type="application/json" id="projects-data">@json($projectsInUse)</script>
 
         <div
             x-data="projectGallery()"
@@ -44,41 +43,43 @@
                         <p class="mt-4 text-base leading-7 text-stone-600">Real projects across the Greater Masaka Region — homes, schools, churches, and community buildings constructed with Butende fired clay products.</p>
                     </div>
 
-                    {{-- Single project display --}}
-                    <div class="mt-8">
-                        <article
-                            class="group relative overflow-hidden rounded-sm bg-stone-200 cursor-pointer max-w-md mx-auto"
-                            @click="openLightbox(0)"
-                            @keydown.enter="openLightbox(0)"
-                            role="button"
-                            tabindex="0"
-                            aria-label="View photo: {{ $project['caption'] }}"
-                        >
-                            <div class="aspect-[4/3] overflow-hidden">
-                                <img
-                                    src="{{ $project['image'] }}"
-                                    alt="{{ $project['caption'] }}"
-                                    class="h-full w-full object-cover transition duration-700 group-hover:scale-[1.04]"
-                                    loading="lazy"
-                                >
-                            </div>
-
-                            {{-- Product badge — top-left, always visible --}}
-                            <span class="absolute left-0 top-0 rounded-br-sm bg-black/45 px-2.5 py-1 text-[0.58rem] font-semibold uppercase tracking-[0.16em] text-white backdrop-blur-[2px]">{{ $project['product'] }}</span>
-
-                            {{-- Expand icon — top-right, on hover --}}
-                            <div class="absolute right-2.5 top-2.5 rounded-sm bg-black/35 p-1.5 opacity-0 backdrop-blur-[2px] transition duration-200 group-hover:opacity-100" aria-hidden="true">
-                                <svg class="h-3.5 w-3.5 text-white" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75h5.25m-5.25 0v5.25m0-5.25 5.25 5.25M20.25 20.25h-5.25m5.25 0v-5.25m0 5.25-5.25-5.25"/></svg>
-                            </div>
-
-                            {{-- Bottom caption strip --}}
-                            <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent p-4 pt-10">
-                                <div class="flex items-end justify-between gap-3">
-                                    <p class="text-sm font-medium leading-snug text-white drop-shadow">{{ $project['caption'] }}</p>
-                                    <span class="shrink-0 rounded-sm bg-[#b86033] px-2.5 py-1 text-[0.58rem] font-semibold uppercase tracking-[0.16em] text-white">{{ $project['tag'] }}</span>
+                    {{-- Projects grid --}}
+                    <div class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                        @foreach($projectsInUse as $index => $project)
+                            <article
+                                class="group relative overflow-hidden rounded-sm bg-stone-200 cursor-pointer"
+                                @click="openLightbox({{ $index }})"
+                                @keydown.enter="openLightbox({{ $index }})"
+                                role="button"
+                                tabindex="0"
+                                aria-label="View photo: {{ $project['caption'] }}"
+                            >
+                                <div class="aspect-[4/3] overflow-hidden">
+                                    <img
+                                        src="{{ $project['image'] }}"
+                                        alt="{{ $project['caption'] }}"
+                                        class="h-full w-full object-cover transition duration-700 group-hover:scale-[1.04]"
+                                        loading="lazy"
+                                    >
                                 </div>
-                            </div>
-                        </article>
+
+                                {{-- Product badge — top-left, always visible --}}
+                                <span class="absolute left-0 top-0 rounded-br-sm bg-black/45 px-2.5 py-1 text-[0.58rem] font-semibold uppercase tracking-[0.16em] text-white backdrop-blur-[2px]">{{ $project['product'] }}</span>
+
+                                {{-- Expand icon — top-right, on hover --}}
+                                <div class="absolute right-2.5 top-2.5 rounded-sm bg-black/35 p-1.5 opacity-0 backdrop-blur-[2px] transition duration-200 group-hover:opacity-100" aria-hidden="true">
+                                    <svg class="h-3.5 w-3.5 text-white" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75h5.25m-5.25 0v5.25m0-5.25 5.25 5.25M20.25 20.25h-5.25m5.25 0v-5.25m0 5.25-5.25-5.25"/></svg>
+                                </div>
+
+                                {{-- Bottom caption strip --}}
+                                <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent p-4 pt-10">
+                                    <div class="flex items-end justify-between gap-3">
+                                        <p class="text-sm font-medium leading-snug text-white drop-shadow">{{ $project['caption'] }}</p>
+                                        <span class="shrink-0 rounded-sm bg-[#b86033] px-2.5 py-1 text-[0.58rem] font-semibold uppercase tracking-[0.16em] text-white">{{ $project['tag'] }}</span>
+                                    </div>
+                                </div>
+                            </article>
+                        @endforeach
                     </div>
 
                 </div>
@@ -116,11 +117,33 @@
 
                 {{-- Image — fills remaining space --}}
                 <div class="relative flex flex-1 items-center justify-center overflow-hidden px-14">
+                    {{-- Previous button --}}
+                    <button
+                        @click="step(-1)"
+                        class="absolute left-4 top-1/2 -translate-y-1/2 flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20 focus:outline-none"
+                        aria-label="Previous image"
+                    >
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                    </button>
+
                     <img
                         :src="lightbox ? lightbox.image : ''"
                         :alt="lightbox ? lightbox.caption : ''"
                         class="max-h-full max-w-full object-contain"
                     >
+
+                    {{-- Next button --}}
+                    <button
+                        @click="step(1)"
+                        class="absolute right-4 top-1/2 -translate-y-1/2 flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20 focus:outline-none"
+                        aria-label="Next image"
+                    >
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </button>
                 </div>
 
                 {{-- Caption bar --}}
